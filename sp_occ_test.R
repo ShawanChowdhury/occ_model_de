@@ -17,7 +17,16 @@ data <- data %>%
   filter(!is.na(lat)) 
 
 # Subset by year
-data <- subset(data, Year>=2011 & Year<2022)
+data <- subset(data, Year>=2016 & Year<2020)
+
+# Adding visit ID
+data <- data %>% 
+  group_by(Species, MTB) %>% 
+  mutate(Replicate = seq_along(Species))
+
+# Only using data from the first three replicates (visit)
+data <- data %>% 
+  filter(Replicate %in% c("1", "2", "3"))
 
 # Adding PA data [ manipulation]
 data$pa <- rnorm(NROW(data), mean = data$yday, sd = 1)
@@ -81,7 +90,7 @@ listlengthDF$yearIndex = as.numeric(as.factor(listlengthDF$Year))
 listlengthDF$pa <- rnorm(NROW(listlengthDF), mean = listlengthDF$nuSpecies, sd = 1)
 listlengthDF$pa = as.numeric(as.factor(listlengthDF$pa))
 
-# get other detection covariates
+# detection covariates
 yday <- reshape2::acast(data, visit ~ Species, value.var="yday", fun=length)
 
 #site covs
@@ -91,7 +100,7 @@ siteCovs <- data %>%
   arrange(site)
 
 #Package up
-data.list <- list(y = occ_data,
+data.list <- list(y = occMatrix,
                   occ.covs = siteCovs,
                   det.covs = list(yday = yday),
                   coords = siteCovs[,c("lon","lat")])
@@ -106,8 +115,8 @@ inits.list <- list(alpha = 0, beta = 0,
                    z = apply(occMatrix, 1, max, na.rm = TRUE))
 
 # Settings
-n.samples <- 10000
-n.report <- 1000
+n.samples <- 10
+n.report <- 10
 
 # Run model - non spatial
 out <- PGOcc(occ.formula = ~ site+lon+lat+pa,
@@ -123,4 +132,20 @@ out <- PGOcc(occ.formula = ~ site+lon+lat+pa,
              n.thin = n.samples/10,
              n.chains = 3)
 
+# Model summary
 summary(out)
+
+ppc.out <- ppcOcc(out, fit.stat = 'freeman-tukey', group = 1)#group 1 = by row/site
+summary(ppc.out)
+
+diff.fit <- ppc.out$fit.y.rep.group.quants[3, ] - ppc.out$fit.y.group.quants[3, ]
+plot(diff.fit, pch = 19, xlab = 'Site ID', ylab = 'Replicate - True Discrepancy')
+
+#plotting
+ppc.df <- data.frame(fit = ppc.out$fit.y,
+                      fit.rep = ppc.out$fit.y.rep,
+                      color = 'lightskyblue1')
+ppc.df$color[ppc.df$fit.rep > ppc.df$fit] <- 'lightsalmon'
+plot(ppc.df$fit, ppc.df$fit.rep, bg = ppc.df$color, pch = 21,
+      ylab = 'Fit', xlab = 'True')
+lines(ppc.df$fit, ppc.df$fit, col = 'black')
