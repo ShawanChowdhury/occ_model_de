@@ -99,6 +99,8 @@ siteCovs <- data %>%
   filter(!duplicated(site)) %>%
   arrange(site)
 
+siteCovs <- siteCovs[,3:6]
+
 #Package up
 data.list <- list(y = occMatrix,
                   occ.covs = siteCovs,
@@ -128,9 +130,9 @@ out <- PGOcc(occ.formula = ~ site+lon+lat+pa,
              n.omp.threads = 1,
              verbose = TRUE,
              n.report = n.report,
-             n.burn = n.samples/2,
-             n.thin = n.samples/10,
-             n.chains = 3)
+             n.burn = 1,
+             n.thin = 1,
+             n.chains = 1)
 
 # Model summary
 summary(out)
