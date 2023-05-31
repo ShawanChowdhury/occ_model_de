@@ -48,3 +48,4 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 data/adultData_dragonflies.csv
+data/adultData.csv
