@@ -12,16 +12,19 @@ data <- read_rds("data/sub_data.rds")
 # detection covariates
 yday <- reshape2::acast(data, visit ~ Species, value.var="yday", fun=length)
 
+# Checking if they have the same number of rows
+NROW(yday) == NROW(occMatrix)
+
 #site covs
 siteCovs <- data %>%
   dplyr::select(site, lon, lat, agriculture, protected_areas) %>%
   filter(!duplicated(site)) %>%
   arrange(site)
 
-siteCovs <- siteCovs[,3:8]
+# siteCovs <- siteCovs[,3:8]
 
 # Package up
-data.list <- list(y = occMatrix,
+data.list <- list(y = occMatrix[,1],
                   occ.covs = siteCovs,
                   det.covs = list(yday = yday),
                   coords = siteCovs[,c("lon","lat")])
@@ -40,7 +43,7 @@ n.samples <- 10
 n.report <- 10
 
 # Run model - non spatial
-out <- PGOcc(occ.formula = ~ site+lon+lat+agriculture+protected_areas,
+out <- PGOcc(occ.formula = ~ protected_areas,
              det.formula = ~ yday,
              data = data.list,
              inits = inits.list,
@@ -49,7 +52,7 @@ out <- PGOcc(occ.formula = ~ site+lon+lat+agriculture+protected_areas,
              n.omp.threads = 1,
              verbose = TRUE,
              n.report = n.report,
-             n.burn = 1,
+             n.burn = 2,
              n.thin = 1,
              n.chains = 1)
 

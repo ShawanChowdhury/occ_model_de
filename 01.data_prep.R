@@ -36,7 +36,7 @@ complete_data <- complete_data %>%
   filter(!is.na(lat))
 
 # Subset by year
-sub_data <- subset(complete_data, Year>=2015 & Year<2018)
+sub_data <- subset(complete_data, Year>=2010 & Year<2018)
 
 ###########################################################
 # Preparing data for model
@@ -89,8 +89,8 @@ sub_data <- sub_data %>% filter(site %in% surveyYears$site[surveyYears$nuYears>1
 #lets decide which species we want to analyse - we have to remove very rare species
 selectSpecies <- subset(speciesSummary, nuRecs > 0)
 
-sub_data <- sub_data %>% 
-  filter(Species == "Aeshna cyanea")
+# sub_data <- sub_data %>% 
+#   filter(Species == "Aeshna cyanea")
 
 # Exporting output
 write_rds(sub_data, "data/sub_data.rds")
