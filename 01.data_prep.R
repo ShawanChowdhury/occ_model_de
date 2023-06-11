@@ -36,19 +36,19 @@ complete_data <- complete_data %>%
   filter(!is.na(lat))
 
 # Subset by year
-sub_data <- subset(complete_data, Year>=2010 & Year<2018)
+sub_data <- subset(complete_data, Year>=2008 & Year<2018)
 
 ###########################################################
 # Preparing data for model
 ###########################################################
-# Adding visit ID
-sub_data <- sub_data %>% 
-  group_by(Species, MTB, Year) %>% 
-  mutate(Replicate = seq_along(Species))
-
-# Only using data from the first three replicates (visit) [for initial run]
-sub_data <- sub_data %>% 
-  filter(Replicate %in% c("1", "2", "3"))
+# # Adding visit ID
+# sub_data <- sub_data %>% 
+#   group_by(Species, MTB, Month, Year, lon, lat) %>% 
+#   mutate(Replicate = seq_along(Species))
+# 
+# # Only using data from the first three replicates (visit) [for initial run]
+# sub_data <- sub_data %>% 
+#   filter(Replicate %in% c("1", "2", "3"))
 
 # Add site information
 sub_data$site <- sub_data$MTB
@@ -86,8 +86,8 @@ summary(speciesSummary)
 # use sites visited in at least two years
 sub_data <- sub_data %>% filter(site %in% surveyYears$site[surveyYears$nuYears>1]) 
 
-#lets decide which species we want to analyse - we have to remove very rare species
-selectSpecies <- subset(speciesSummary, nuRecs > 0)
+# #lets decide which species we want to analyse - we have to remove very rare species
+# selectSpecies <- subset(speciesSummary, nuRecs > 0)
 
 # sub_data <- sub_data %>% 
 #   filter(Species == "Aeshna cyanea")
