@@ -71,7 +71,7 @@ visit_data$yearIndex <- as.numeric(visit_data$Year)
 visit_data$monthIndex <- as.numeric(visit_data$Month)
 
 #make response into the matrix
-y <- reshape2::acast(visit_data, site ~ yearIndex ~ monthIndex ~ visit,
+y <- reshape2::acast(visit_data, site ~ yearIndex ~ visit,
                      value.var = "Species")
 dim(y)
 
