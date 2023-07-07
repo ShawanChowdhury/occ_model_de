@@ -44,22 +44,28 @@ myspecies <- "Aeshna cyanea"
 #add on the focal species data for this task
 visit_data$Species <- occMatrix[,myspecies]
 
+# Checking presence and absence details
+table(visit_data$Species)
+
 ### format ###########################################
 
 #for spOccupancy we need to format the data into a matrix
 
-# #how many visits per site per year
-# visitSummary <- visit_data %>%
-#   group_by(site, Year) %>%
-#   summarise(nuVisits = length(visit))
+#how many visits per site per year
+visitSummary <- visit_data %>%
+   group_by(site, Year) %>%
+   summarise(nuVisits = length(visit))
+
+sub <- visit_data %>% 
+  filter(Year == 2013 & site == 916)
 
 #some sampled up to 174 times!!
 #subsample at most 10 visits per year at any specific site
-# visit_data <- visit_data %>%
-#   group_by(site, Year) %>%
-#   mutate(mySample = ifelse(length(visit)>10, 10, length(visit))) %>%
-#   sample_n(.,size=mySample) %>%
-#   ungroup()
+visit_data <- visit_data %>%
+   group_by(site, Year) %>%
+   mutate(mySample = ifelse(length(visit)>10, 10, length(visit))) %>% 
+   sample_n(.,size=unique(mySample)) %>%
+   ungroup()
 
 #need to make visit be indexed from i to n within each site, year, and month
 visit_data <- visit_data %>%
