@@ -69,7 +69,7 @@ visit_data <- visit_data %>%
 
 #need to make visit be indexed from i to n within each site, year, and month
 visit_data <- visit_data %>%
-  group_by(site, Year, Month) %>%
+  group_by(site, Year) %>%
   mutate(visit = as.numeric(as.factor(visit)))%>%
   ungroup() 
 
