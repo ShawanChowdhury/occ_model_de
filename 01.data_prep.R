@@ -36,7 +36,7 @@ complete_data <- complete_data %>%
   filter(!is.na(lat))
 
 # Subset by year
-sub_data <- subset(complete_data, Year>=2008 & Year<2018)
+#sub_data <- subset(complete_data, Year>=2008 & Year<2018)
 
 ###########################################################
 # Preparing data for model
@@ -51,13 +51,13 @@ sub_data <- subset(complete_data, Year>=2008 & Year<2018)
 #   filter(Replicate %in% c("1", "2", "3"))
 
 # Add site information
-sub_data$site <- sub_data$MTB
+complete_data$site <- complete_data$MTB
 
 # Define a visit as site + date
-sub_data$visit <- paste(sub_data$site, sub_data$Date, sep="_")
+complete_data$visit <- paste(complete_data$site, complete_data$Date, sep="_")
 
 #lets look at how many unique surveys (i.e., visits) we have
-surveys <- unique(sub_data[,c("visit","site","lon","lat","yday","Month","Year")])
+surveys <- unique(complete_data[,c("visit","site","lon","lat","yday","Month","Year")])
 
 # How many grids were surveyed in at least two years?
 # This is the threshold usuauly used in occupancy models
@@ -75,7 +75,7 @@ surveySummary <- surveys %>%
   filter(n>1) 
 
 # Records per species
-speciesSummary <- sub_data %>%
+speciesSummary <- complete_data %>%
   filter(site %in% surveyYears$site[surveyYears$nuYears>1]) %>%
   group_by(Species) %>%
   summarise(nuRecs = length(source),
@@ -84,25 +84,25 @@ speciesSummary <- sub_data %>%
 summary(speciesSummary)
 
 # use sites visited in at least two years
-sub_data <- sub_data %>% filter(site %in% surveyYears$site[surveyYears$nuYears>1]) 
+complete_data <- complete_data %>% filter(site %in% surveyYears$site[surveyYears$nuYears>1]) 
+
+# Exporting output
+write_rds(complete_data, "data/complete_data.rds")
 
 # #lets decide which species we want to analyse - we have to remove very rare species
 # selectSpecies <- subset(speciesSummary, nuRecs > 0)
 
-# sub_data <- sub_data %>% 
-#   filter(Species == "Aeshna cyanea")
-
 # Exporting output
-write_rds(sub_data, "data/sub_data.rds")
+# write_rds(sub_data, "data/sub_data.rds")
 
 # Creating long list 
-listlengthDF <- sub_data %>%
+listlengthDF <- complete_data %>%
   group_by(visit, Year, yday, site) %>%
   summarize(nuSpecies = length(unique(Species))) %>%
   ungroup()
 
 # organize species matrix of detection-non detections in a given visit
-occMatrix <- reshape2::acast(sub_data, visit ~ Species, value.var="Year", fun=length) #default to length
+occMatrix <- reshape2::acast(complete_data, visit ~ Species, value.var="Year", fun=length) #default to length
 occMatrix[1:10, 1:10]
 occMatrix[occMatrix>1] <- 1 # make binary
 occMatrix[is.na(occMatrix)] <- 0 
@@ -111,3 +111,5 @@ occMatrix[is.na(occMatrix)] <- 0
 all(row.names(occMatrix) == listlengthDF$visit)
 
 write_rds(occMatrix, "data/occ_matrix.rds")
+
+#######################################
