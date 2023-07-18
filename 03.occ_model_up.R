@@ -15,7 +15,11 @@ species <- fread(opts$species)
 ## try to get task id
 task <- as.integer(Sys.getenv("SLURM_ARRAY_TASK_ID"))
 
+print(paste("task:", task))
+
 species_name <- species[task]
+
+print(paste("species_name:", species_name))
 
 ### get data #############################################
 visit_data <- read_rds("data/complete_data.rds")
