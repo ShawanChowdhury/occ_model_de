@@ -1,6 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=03.occ_model_up
+#SBATCH --chdir=/home/chowdhus/occ_model_de
 #SBATCH --output=/work/%u/%x-%A-%a.out
 #SBATCH --time=7-00:00:00
 
