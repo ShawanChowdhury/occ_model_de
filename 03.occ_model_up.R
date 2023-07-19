@@ -3,6 +3,7 @@ library(tidyverse)
 library(spOccupancy)
 library(MCMCvis)
 library(docopt)
+library(data.table)
 
 doc <- "usage: 03.occ_model_up.R <species> <output_dir>"
 opts <- docopt(doc)
