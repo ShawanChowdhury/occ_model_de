@@ -16,7 +16,7 @@ task <- as.integer(Sys.getenv("SLURM_ARRAY_TASK_ID"))
 
 print(paste("task:", task))
 
-species_name <- species[[task]]
+species_name <- species$species[[task]]
 
 print(paste("species_name:", species_name))
 print(paste("class(species_name):", class(species_name)))
