@@ -1,9 +1,7 @@
 #libraries
 library(tidyverse)
 library(spOccupancy)
-library(data.table)
 library(MCMCvis)
-library(data.table)
 library(docopt)
 
 doc <- "usage: 03.occ_model_up.R <species> <output_dir>"
