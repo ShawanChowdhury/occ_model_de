@@ -3,13 +3,12 @@ library(tidyverse)
 library(spOccupancy)
 library(MCMCvis)
 library(docopt)
-library(data.table)
 
 doc <- "usage: 03.occ_model_up.R <species> <output_dir>"
 opts <- docopt(doc)
 
 ## read parameter file
-species <- fread(opts$species, sep = ",")
+species <- read.csv(opts$species)
 
 ## try to get task id
 task <- as.integer(Sys.getenv("SLURM_ARRAY_TASK_ID"))
