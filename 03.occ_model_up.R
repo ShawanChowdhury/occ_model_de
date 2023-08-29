@@ -120,15 +120,15 @@ all.priors <- list(beta.normal = list(mean = 0, var = 2.72),
                    alpha.normal = list(mean = 0, var = 2.72),
                    sigma.sq.psi.ig = list(a = 0.1, b = 0.1))
 
-n.chains <- 2
-n.batch <- 150
+n.chains <- 3
+n.batch <- 1500
 batch.length <- 100
 (n.samples <- n.batch * batch.length) 
 #n.samples <- 50000
 n.burn <- n.samples*3/4
 n.thin <- 30
 ar1 <- FALSE
-n.report <- 1000
+n.report <- 10000
 
 ###non sp trend run ##########################################
 
