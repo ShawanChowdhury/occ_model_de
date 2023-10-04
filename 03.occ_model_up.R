@@ -158,4 +158,4 @@ out <- tPGOcc(occ.formula = occ.formula,
 #summary samples
 psiCovs <- MCMCsummary(out$beta.samples)
 
-saveRDS(psiCovs, file.path(opts$output_dir, paste0("spocc_t_summary_",species,".rds")))
+saveRDS(psiCovs, file = paste0("spocc_t_summary_",species,".rds"))
