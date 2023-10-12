@@ -120,15 +120,15 @@ all.priors <- list(beta.normal = list(mean = 0, var = 2.72),
                    alpha.normal = list(mean = 0, var = 2.72),
                    sigma.sq.psi.ig = list(a = 0.1, b = 0.1))
 
-n.chains <- 3
-n.batch <- 1500
-batch.length <- 100
+n.chains <- 1
+n.batch <- 150
+batch.length <- 10
 (n.samples <- n.batch * batch.length) 
 #n.samples <- 50000
 n.burn <- n.samples*3/4
-n.thin <- 30
+n.thin <- 3
 ar1 <- FALSE
-n.report <- 10000
+n.report <- 1000
 
 ###non sp trend run ##########################################
 
@@ -158,4 +158,8 @@ out <- tPGOcc(occ.formula = occ.formula,
 #summary samples
 psiCovs <- MCMCsummary(out$beta.samples)
 
-saveRDS(psiCovs, file = paste0("spocc_t_summary_",species,".rds"))
+output_file <- paste0("spocc_t_summary_", species_name,".rds")
+print(output_file)
+
+saveRDS(psiCovs, file = "/work/chowdhus/output.rds") # only when running for one species
+saveRDS(psiCovs, file = output_file)
