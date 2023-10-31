@@ -5,27 +5,27 @@ library(tidyverse)
 # Importing and combining data
 ###########################################################
 # Import data
-data <- read_csv("data/adultData.csv")
-var <- read_csv("data/variable_data.csv")
-
-# Explore data
-head(data)
-head(var)
-
-# Converting variable data to wide format
-var_wide <- tidyr::pivot_wider(var,
-                               names_from = "land_use",
-                               values_from = "percentages",
-                               values_fill = 0)
-
-# Renaming col name
-colnames(var_wide)[1] <- "MTB"
-
-# Combining data
-complete_data <- dplyr::left_join(data, var_wide, by = c("MTB"))
-
-# Cleaning memory
-rm("data", "var")
+complete_data <- read_csv("data/adultData.csv")
+# var <- read_csv("data/variable_data.csv")
+# 
+# # Explore data
+# head(data)
+# head(var)
+# 
+# # Converting variable data to wide format
+# var_wide <- tidyr::pivot_wider(var,
+#                                names_from = "land_use",
+#                                values_from = "percentages",
+#                                values_fill = 0)
+# 
+# # Renaming col name
+# colnames(var_wide)[1] <- "MTB"
+# 
+# # Combining data
+# complete_data <- dplyr::left_join(data, var_wide, by = c("MTB"))
+# 
+# # Cleaning memory
+# rm("data", "var")
 
 ###########################################################
 # Cleaning data
