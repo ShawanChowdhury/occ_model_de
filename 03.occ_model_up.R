@@ -105,6 +105,9 @@ data.list <- list(y = y,
 
 print("data ready")
 
+## Create two variables, one on day and one on day square and run the entire script again
+# to see if there is any change [similar to the nimble script]
+
 ### model setting ##########################################
 
 z.inits <- apply(y, c(1, 2), 
@@ -121,12 +124,12 @@ all.priors <- list(beta.normal = list(mean = 0, var = 2.72),
                    sigma.sq.psi.ig = list(a = 0.1, b = 0.1))
 
 n.chains <- 3
-n.batch <- 1500
-batch.length <- 100
+n.batch <- 400
+batch.length <- 25
 (n.samples <- n.batch * batch.length) 
 #n.samples <- 50000
-n.burn <- n.samples*3/4
-n.thin <- 30
+n.burn <- 2000
+n.thin <- 4
 ar1 <- FALSE
 n.report <- 10000
 
@@ -156,7 +159,8 @@ out <- tPGOcc(occ.formula = occ.formula,
 # waicOcc(out)
 
 #summary samples
-output_file <- saveRDS(out, file = paste0("Model_", species_name,".rds"))
-print(output_file)
+output_file <- saveRDS(out, file = paste0("ModelOutput_", species_name,".rds"))
 
-saveRDS(out, file = "/work/chowdhus/ModelSummary.rds") # only when running for one species
+# print(output_file)
+# 
+# saveRDS(out, file = "/work/chowdhus/ModelSummary.rds") # only when running for one species

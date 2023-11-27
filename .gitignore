@@ -56,3 +56,6 @@ data/occ_matrix.rds
 output/test.rds
 data/occ_matrix_test.rds
 *.rds
+data/citation_info.csv
+data/Species for test.xlsx
+data/trait_info.xlsx

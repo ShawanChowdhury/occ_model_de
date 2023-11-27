@@ -145,6 +145,13 @@ waicOcc(out)
 #summary samples
 psiCovs <- MCMCsummary(out$beta.samples)
 
+rhat <- as.data.frame(out$rhat$beta)
+colnames(rhat) <- "rhat"
+
+psiCovs <- psiCovs %>% 
+  mutate(rhat = rhat)
+
+
 output_file <- saveRDS(psiCovs, file = paste0("MCMC_summary_", species_name,".rds"))
 
 ppc.out <- ppcOcc(out, fit.stat = 'freeman-tukey', group = 1)
