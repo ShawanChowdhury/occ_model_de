@@ -1,11 +1,11 @@
 #!/bin/bash
 
-#SBATCH --job-name=03.occ_model_up
+#SBATCH --job-name=03.occ_model_up_carabid
 #SBATCH --chdir=/home/chowdhus/occ_model_de
 #SBATCH --output=/work/%u/%x-%A-%a.out
 #SBATCH --time=14-00:00:00
 
-#SBATCH --mem-per-cpu=128G
+#SBATCH --mem-per-cpu=64G
 
 module load foss/2022b R/4.2.2
 

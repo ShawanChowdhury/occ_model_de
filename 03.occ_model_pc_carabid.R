@@ -5,25 +5,25 @@ library(MCMCvis)
 library(docopt)
 
 ### get data #############################################
-visit_data <- read_rds("data/complete_data_test.rds")
+visit_data <- read_rds("data/complete_data_carabid.rds")
 
 visit_data <- visit_data %>%
-  group_by(visit, Year, yday, site, Month) %>%
-  summarize(nuSpecies = length(unique(Species))) %>%
+  group_by(visit, year_range, day, site, month) %>%
+  summarize(nuSpecies = length(unique(species))) %>%
   ungroup()
 
 #metadata for each visit
 
 #the species binary matric
-occMatrix <- read_rds("data/occ_matrix_test.rds")
+occMatrix <- read_rds("data/occ_matrix_carabid.rds")
 #each row is a visit, while each column is data for a species
 
 #check the visit data fram and occ matrix align
 all(visit_data$visit==row.names(occMatrix))
 #this should be TRUE - if not, you need to rearrange the above objects
 
-species_name <- "Aeshna grandis"
-  
+species_name <- "Abax ovalis"
+
 #add on the focal species data for this task
 visit_data$Species <- occMatrix[,species_name]
 
@@ -36,25 +36,25 @@ table(visit_data$Species)
 
 #how many visits per site per year
 visitSummary <- visit_data %>%
-   group_by(site, Year) %>%
-   summarise(nuVisits = length(visit))
+  group_by(site, year_range) %>%
+  summarise(nuVisits = length(visit))
 
 #some sampled up to 174 times!!
 #subsample at most 10 visits per year at any specific site
 visit_data <- visit_data %>%
-   group_by(site, Year) %>%
-   mutate(mySample = ifelse(length(visit)>10, 10, length(visit))) %>% 
-   sample_n(.,size=unique(mySample)) %>%
-   ungroup()
+  group_by(site, year_range) %>%
+  mutate(mySample = ifelse(length(visit)>10, 10, length(visit))) %>% 
+  sample_n(.,size=unique(mySample)) %>%
+  ungroup()
 
 #need to make visit be indexed from i to n within each site, year, and month
 visit_data <- visit_data %>%
-  group_by(site, Year) %>%
+  group_by(site, year_range) %>%
   mutate(visit = as.numeric(as.factor(visit)))%>%
   ungroup() 
 
-visit_data$yearIndex <- as.numeric(visit_data$Year)
-visit_data$monthIndex <- as.numeric(visit_data$Month)
+visit_data$yearIndex <- as.numeric(visit_data$year_range)
+visit_data$monthIndex <- as.numeric(visit_data$month)
 
 #make response into the matrix
 y <- reshape2::acast(visit_data, site ~ yearIndex ~ visit,
@@ -138,7 +138,7 @@ write_rds(out, "output/test.rds")
 
 # print summary
 summary <- summary(out)
- 
+
 # waic
 waicOcc(out)
 

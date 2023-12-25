@@ -59,3 +59,11 @@ data/occ_matrix_test.rds
 data/citation_info.csv
 data/Species for test.xlsx
 data/trait_info.xlsx
+*.csv
+data/citation.jpg
+data/citation.pdf
+data/Santangeli_etal_Data_Script/Santangeli_etal_Data_Script/HMSC_models/birds/birds_HMSC.R
+data/Santangeli_etal_Data_Script/Santangeli_etal_Data_Script/HMSC_models/mammals/mammals_HMSC.R
+data/Santangeli_etal_Data_Script/Santangeli_etal_Data_Script/HMSC_models/phytoplankton/phytoplankton_HMSC.R
+data/Santangeli_etal_Data_Script/Santangeli_etal_Data_Script/HMSC_models/plants/plants_HMSC.R
+data/Santangeli_etal_Data_Script/Santangeli_etal_Data_Script/SiteMatchingBirdExample.R

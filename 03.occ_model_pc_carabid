@@ -23,7 +23,7 @@ all(visit_data$visit==row.names(occMatrix))
 #this should be TRUE - if not, you need to rearrange the above objects
 
 species_name <- "Aeshna grandis"
-  
+
 #add on the focal species data for this task
 visit_data$Species <- occMatrix[,species_name]
 
@@ -36,16 +36,16 @@ table(visit_data$Species)
 
 #how many visits per site per year
 visitSummary <- visit_data %>%
-   group_by(site, Year) %>%
-   summarise(nuVisits = length(visit))
+  group_by(site, Year) %>%
+  summarise(nuVisits = length(visit))
 
 #some sampled up to 174 times!!
 #subsample at most 10 visits per year at any specific site
 visit_data <- visit_data %>%
-   group_by(site, Year) %>%
-   mutate(mySample = ifelse(length(visit)>10, 10, length(visit))) %>% 
-   sample_n(.,size=unique(mySample)) %>%
-   ungroup()
+  group_by(site, Year) %>%
+  mutate(mySample = ifelse(length(visit)>10, 10, length(visit))) %>% 
+  sample_n(.,size=unique(mySample)) %>%
+  ungroup()
 
 #need to make visit be indexed from i to n within each site, year, and month
 visit_data <- visit_data %>%
@@ -138,7 +138,7 @@ write_rds(out, "output/test.rds")
 
 # print summary
 summary <- summary(out)
- 
+
 # waic
 waicOcc(out)
 

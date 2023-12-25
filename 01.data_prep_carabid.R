@@ -5,27 +5,21 @@ library(tidyverse)
 # Importing and combining data
 ###########################################################
 # Import data
-complete_data <- read_csv("data/adultData.csv")
-# var <- read_csv("data/variable_data.csv")
-# 
-# # Explore data
-# head(data)
-# head(var)
-# 
-# # Converting variable data to wide format
-# var_wide <- tidyr::pivot_wider(var,
-#                                names_from = "land_use",
-#                                values_from = "percentages",
-#                                values_fill = 0)
-# 
-# # Renaming col name
-# colnames(var_wide)[1] <- "MTB"
-# 
-# # Combining data
-# complete_data <- dplyr::left_join(data, var_wide, by = c("MTB"))
-# 
-# # Cleaning memory
-# rm("data", "var")
+complete_data <- read_csv("data/carabid_initial_data.csv")
+
+# Subset by year
+complete_data <- subset(complete_data, year>=1982 & year<2022)
+
+# # Grouping data by years
+complete_data <- complete_data %>%
+  mutate(year_range=cut(year, breaks=c(1982, 1991, 2001, 2011, 2021),
+                        labels=c("1","2","3", "4")))
+
+complete_data$lon <- as.numeric(complete_data$lon)
+complete_data$lat <- as.numeric(complete_data$lat)
+complete_data$month <- as.numeric(complete_data$month)
+complete_data$year_range <- as.numeric(complete_data$year_range)
+complete_data$day <- as.numeric(complete_data$day)
 
 ###########################################################
 # Cleaning data
@@ -35,59 +29,49 @@ complete_data <- complete_data %>%
   filter(!is.na(lon)) %>%
   filter(!is.na(lat))
 
-# Subset by year
-sub_data <- subset(complete_data, Year>=2008 & Year<2018)
-
 ###########################################################
 # Preparing data for model
 ###########################################################
-# # Adding visit ID
-# sub_data <- sub_data %>% 
-#   group_by(Species, MTB, Month, Year, lon, lat) %>% 
-#   mutate(Replicate = seq_along(Species))
-# 
-# # Only using data from the first three replicates (visit) [for initial run]
-# sub_data <- sub_data %>% 
-#   filter(Replicate %in% c("1", "2", "3"))
-
 # Add site information
-complete_data$site <- complete_data$MTB
+#these help us organise the data for the occupancy model
+complete_data$site <- paste(complete_data$lon, complete_data$lat, sep="-") # short cut
+complete_data$date <- paste(complete_data$day, complete_data$month, complete_data$year_range, sep="-")
 
 # Define a visit as site + date
-complete_data$visit <- paste(complete_data$site, complete_data$Date, sep="_")
+complete_data$visit <- paste(complete_data$site, complete_data$date, sep="_")
 
 #lets look at how many unique surveys (i.e., visits) we have
-surveys <- unique(complete_data[,c("visit","site","lon","lat","yday","Month","Year")])
+surveys <- unique(complete_data[,c("visit","site","lon","lat","day","month","year_range")])
 
 # How many grids were surveyed in at least two years?
-# This is the threshold usuauly used in occupancy models
+# This is the threshold usually used in occupancy models
 surveyYears <- surveys %>%
   group_by(site) %>%
-  summarize(nuYears = length(unique(Year))) 
+  summarize(nuYears = length(unique(year_range))) 
 
 # Do we have repeated surveys within years at same site?
 # This is a prerequisite of occupancy-detection models
 # at least some sites need to be visited at least twice within the year
 surveySummary <- surveys %>%
   filter(site %in% surveyYears$site[surveyYears$nuYears>1]) %>%
-  group_by(site, Year) %>%
+  group_by(site, year_range) %>%
   count() %>%
   filter(n>1) 
 
 # Records per species
 speciesSummary <- complete_data %>%
   filter(site %in% surveyYears$site[surveyYears$nuYears>1]) %>%
-  group_by(Species) %>%
+  group_by(species) %>%
   summarise(nuRecs = length(source),
             nuSites = length(unique(site)),
-            nuYears = length(unique(Year)))
+            nuYears = length(unique(year_range)))
 summary(speciesSummary)
 
 # use sites visited in at least two years
 complete_data <- complete_data %>% filter(site %in% surveyYears$site[surveyYears$nuYears>1]) 
 
 # Exporting output
-write_rds(complete_data, "data/complete_data_test.rds")
+write_rds(complete_data, "data/complete_data_carabid.rds")
 
 # #lets decide which species we want to analyse - we have to remove very rare species
 # selectSpecies <- subset(speciesSummary, nuRecs > 0)
@@ -97,12 +81,12 @@ write_rds(complete_data, "data/complete_data_test.rds")
 
 # Creating long list 
 listlengthDF <- complete_data %>%
-  group_by(visit, Year, yday, site) %>%
-  summarize(nuSpecies = length(unique(Species))) %>%
+  group_by(visit, year_range, day, site) %>%
+  summarize(nuSpecies = length(unique(species))) %>%
   ungroup()
 
 # organize species matrix of detection-non detections in a given visit
-occMatrix <- reshape2::acast(complete_data, visit ~ Species, value.var="Year", fun=length) #default to length
+occMatrix <- reshape2::acast(complete_data, visit ~ species, value.var="year_range", fun=length) #default to length
 occMatrix[1:10, 1:10]
 occMatrix[occMatrix>1] <- 1 # make binary
 occMatrix[is.na(occMatrix)] <- 0 
@@ -110,6 +94,6 @@ occMatrix[is.na(occMatrix)] <- 0
 # check the detection - non detection data aligns with the visit data
 all(row.names(occMatrix) == listlengthDF$visit)
 
-write_rds(occMatrix, "data/occ_matrix_test.rds")
+write_rds(occMatrix, "data/occ_matrix_carabid.rds")
 
 #######################################
