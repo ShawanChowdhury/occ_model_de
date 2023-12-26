@@ -70,28 +70,28 @@ summary(speciesSummary)
 # use sites visited in at least two years
 complete_data <- complete_data %>% filter(site %in% surveyYears$site[surveyYears$nuYears>1]) 
 
-sub_data <- complete_data %>% 
-  filter(species %in% c("Carabus nitens",
-                        "Abax parallelus",
-                        "Carabus convexus",
-                        "Carabus arcensis",
-                        "Agonum ericeti",
-                        "Amara famelica",
-                        "Amara infima",
-                        "Poecilus versicolor",
-                        "Harpalus rufipes",
-                        "Abax parallelepipedus",
-                        "Carabus auronitens",
-                        "Bembidion lampros",
-                        "Bembidion properans",
-                        "Trechus quadristriatus",
-                        "Poecilus cupreus",
-                        "Zabrus tenebrioides",
-                        "Pterostichus melanarius"
-  ))
+# sub_data <- complete_data %>% 
+#   filter(species %in% c("Carabus nitens",
+#                         "Abax parallelus",
+#                         "Carabus convexus",
+#                         "Carabus arcensis",
+#                         "Agonum ericeti",
+#                         "Amara famelica",
+#                         "Amara infima",
+#                         "Poecilus versicolor",
+#                         "Harpalus rufipes",
+#                         "Abax parallelepipedus",
+#                         "Carabus auronitens",
+#                         "Bembidion lampros",
+#                         "Bembidion properans",
+#                         "Trechus quadristriatus",
+#                         "Poecilus cupreus",
+#                         "Zabrus tenebrioides",
+#                         "Pterostichus melanarius"
+#   ))
 
 # Exporting output
-write_rds(sub_data, "data/complete_data_carabid.rds")
+write_rds(complete_data, "data/complete_data_carabid.rds")
 
 # #lets decide which species we want to analyse - we have to remove very rare species
 # selectSpecies <- subset(speciesSummary, nuRecs > 0)
@@ -100,13 +100,13 @@ write_rds(sub_data, "data/complete_data_carabid.rds")
 # write_rds(sub_data, "data/sub_data.rds")
 
 # Creating long list 
-listlengthDF <- sub_data %>%
+listlengthDF <- complete_data %>%
   group_by(visit, year_range, day, site) %>%
   summarize(nuSpecies = length(unique(species))) %>%
   ungroup()
 
 # organize species matrix of detection-non detections in a given visit
-occMatrix <- reshape2::acast(sub_data, visit ~ species, value.var="year_range", fun=length) #default to length
+occMatrix <- reshape2::acast(complete_data, visit ~ species, value.var="year_range", fun=length) #default to length
 occMatrix[1:10, 1:10]
 occMatrix[occMatrix>1] <- 1 # make binary
 occMatrix[is.na(occMatrix)] <- 0 
