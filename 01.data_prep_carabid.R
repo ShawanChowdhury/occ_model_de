@@ -71,7 +71,24 @@ summary(speciesSummary)
 complete_data <- complete_data %>% filter(site %in% surveyYears$site[surveyYears$nuYears>1]) 
 
 sub_data <- complete_data %>% 
-  filter(species %in% c("Pterostichus melanarius", "Harpalus affinis", "Nebria brevicollis"))
+  filter(species %in% c("Carabus nitens",
+                        "Abax parallelus",
+                        "Carabus convexus",
+                        "Carabus arcensis",
+                        "Agonum ericeti",
+                        "Amara famelica",
+                        "Amara infima",
+                        "Poecilus versicolor",
+                        "Harpalus rufipes",
+                        "Abax parallelepipedus",
+                        "Carabus auronitens",
+                        "Bembidion lampros",
+                        "Bembidion properans",
+                        "Trechus quadristriatus",
+                        "Poecilus cupreus",
+                        "Zabrus tenebrioides",
+                        "Pterostichus melanarius"
+  ))
 
 # Exporting output
 write_rds(sub_data, "data/complete_data_carabid.rds")
