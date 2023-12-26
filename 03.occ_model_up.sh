@@ -9,7 +9,7 @@
 
 module load foss/2022b R/4.2.2
 
-species="$1-3"
+species="$1"
 
 array_or_job_id=${SLURM_ARRAY_JOB_ID:-$SLURM_JOB_ID}
 output_dir="/work/$USER/$SLURM_JOB_NAME"
