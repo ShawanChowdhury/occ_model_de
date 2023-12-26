@@ -4,7 +4,7 @@ library(spOccupancy)
 library(MCMCvis)
 library(docopt)
 
-doc <- "usage: 03.occ_model_up.R <species> <output_dir>"
+doc <- "usage: 03.occ_model_up_carabid.R <species> <output_dir>"
 opts <- docopt(doc)
 
 ## read parameter file
