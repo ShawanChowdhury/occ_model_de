@@ -3,9 +3,9 @@
 #SBATCH --job-name=03.occ_model_up_carabid
 #SBATCH --chdir=/home/chowdhus/occ_model_de
 #SBATCH --output=/work/%u/%x-%A-%a.out
-#SBATCH --time=7-00:00:00
+#SBATCH --time=1-00:00:00
 
-#SBATCH --mem-per-cpu=64G
+#SBATCH --mem-per-cpu=32G
 
 module load foss/2022b R/4.2.2
 
