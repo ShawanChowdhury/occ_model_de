@@ -74,7 +74,7 @@ sub_data <- complete_data %>%
   filter(species %in% c("Pterostichus melanarius", "Harpalus affinis", "Nebria brevicollis"))
 
 # Exporting output
-write_rds(complete_data, "data/complete_data_carabid.rds")
+write_rds(sub_data, "data/complete_data_carabid.rds")
 
 # #lets decide which species we want to analyse - we have to remove very rare species
 # selectSpecies <- subset(speciesSummary, nuRecs > 0)
