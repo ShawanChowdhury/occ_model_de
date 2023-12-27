@@ -119,12 +119,12 @@ all.priors <- list(beta.normal = list(mean = 0, var = 2.72),
                    sigma.sq.psi.ig = list(a = 0.1, b = 0.1))
 
 n.chains <- 3
-n.batch <- 400
-batch.length <- 25
+n.batch <- 1500
+batch.length <- 100
 (n.samples <- n.batch * batch.length) 
 #n.samples <- 50000
-n.burn <- 2000
-n.thin <- 4
+n.burn <- n.samples*3/4
+n.thin <- 30
 ar1 <- FALSE
 n.report <- 10000
 
