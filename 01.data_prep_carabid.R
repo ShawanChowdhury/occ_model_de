@@ -5,14 +5,27 @@ library(tidyverse)
 # Importing and combining data
 ###########################################################
 # Import data
-complete_data <- read_csv("data/carabid_initial_data.csv")
+complete_data <- read_delim("data/carabid_mtb.txt")
+
+# Data organising
+colnames(complete_data)
+
+colnames(complete_data)[3] <- "site"
+
+complete_data <- complete_data %>% 
+  select(site, species, lon, lat, day, month, year, source)
+
+write_csv(complete_data, "data/carabid_initial_data_up.csv")
+
+# Importing revised data
+complete_data <- read_csv("data/carabid_initial_data_up.csv")
 
 # Subset by year
-complete_data <- subset(complete_data, year>=1982 & year<2022)
+complete_data <- subset(complete_data, year>=1974 & year<2022)
 
 # # Grouping data by years
 complete_data <- complete_data %>%
-  mutate(year_range=cut(year, breaks=c(1982, 1991, 2001, 2011, 2021),
+  mutate(year_range=cut(year, breaks=c(1973, 1985, 1997, 2009, 2021),
                         labels=c("1","2","3", "4")))
 
 complete_data$lon <- as.numeric(complete_data$lon)
@@ -33,8 +46,10 @@ complete_data <- complete_data %>%
 # Preparing data for model
 ###########################################################
 # Add site information
-#these help us organise the data for the occupancy model
-complete_data$site <- paste(complete_data$lon, complete_data$lat, sep="-") # short cut
+#I have already assigned the MTB grid cells as site, so I don't need to create site information
+#complete_data$site <- paste(complete_data$lon, complete_data$lat, sep="-") # short cut
+
+# Add visit information
 complete_data$date <- paste(complete_data$day, complete_data$month, complete_data$year_range, sep="-")
 
 # Define a visit as site + date
