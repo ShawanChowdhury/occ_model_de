@@ -154,7 +154,11 @@ out <- tPGOcc(occ.formula = occ.formula,
 # waicOcc(out)
 
 #summary samples
-output_file <- saveRDS(out, file = paste0("ModelOutput_", species_name,".rds"))
+# output_file <- saveRDS(out, file = paste0("ModelOutput_", species_name,".rds"))
+
+output_file <- saveRDS(out, file = paste0("/work/chowdhus/ModelOutput_", 
+                                          species_name,".rds"))
+
 
 # print(output_file)
 # 
