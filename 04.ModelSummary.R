@@ -26,14 +26,13 @@ sp <- rds[stringr::str_detect(rds, species_name)]
 
 out <- read_rds(sp)
 
-print(rds)
 print(sp)
 
 
 ####################################
 # waic
 waicOcc <- waicOcc(out)
-waicOcc <- as.data.frame(waicOcc)
+waicOcc <- data.frame(waicOcc)
 colnames(waicOcc) <- "val"
 
 waicOcc <- waicOcc %>% 
