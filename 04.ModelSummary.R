@@ -22,7 +22,7 @@ print(paste("class(species_name):", class(species_name)))
 
 ### get data #############################################
 rds <- list.files(path = "/gpfs1/work/chowdhus/03.occ_model_up_carabid/outputs/", pattern = "\\.rds$", recursive = TRUE, full.names = TRUE)
-sp <- rds[stringr::str_detect(rds, species)]
+sp <- rds[stringr::str_detect(rds, species_name)]
 
 out <- read_rds(sp)
 
