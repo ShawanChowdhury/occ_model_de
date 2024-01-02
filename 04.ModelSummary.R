@@ -52,5 +52,5 @@ psiCovs <- psiCovs %>%
          waic = waicOcc$WAIC,
          species_name = species_name)
 
-output_file <- write_csv(out, file = paste0("/work/chowdhus/ModelSummary_", 
+output_file <- write.csv(out, file = paste0("/work/chowdhus/ModelSummary_", 
                                           species_name,".csv"))
