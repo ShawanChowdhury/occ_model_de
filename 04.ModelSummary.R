@@ -45,7 +45,7 @@ waicOcc <- waicOcc %>%
 #summary samples
 psiCovs <- MCMCsummary(out$beta.samples)
 
-rhat <- as.data.frame(out$rhat$beta)
+rhat <- data.frame(out$rhat$beta)
 colnames(rhat) <- "rhat"
 
 # Merging model output
