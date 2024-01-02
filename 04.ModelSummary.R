@@ -21,7 +21,7 @@ print(paste("species_name:", species_name))
 print(paste("class(species_name):", class(species_name)))
 
 ### get data #############################################
-rds <- list.files(path = "/gpfs1/work/chowdhus/03.occ_model_up_carabid/outputs/", pattern = "\\.rds$", recursive = TRUE, full.names = TRUE)
+rds <- list.files(path = "/gpfs1/work/chowdhus/03.occ_model_up_carabid/outputs", pattern = "\\.rds$", recursive = TRUE, full.names = TRUE)
 sp <- rds[stringr::str_detect(rds, species_name)]
 
 out <- read_rds(sp)
@@ -45,7 +45,7 @@ psiCovs <- MCMCsummary(out$beta.samples)
 
 rhat <- out$rhat$beta
 
-# Merging model output
+# Mer???ging model output
 psiCovs <- psiCovs %>% 
   mutate(Rhat = rhat,
          elpd = df$elpd,
