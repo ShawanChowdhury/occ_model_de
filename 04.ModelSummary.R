@@ -32,28 +32,25 @@ print(sp)
 ####################################
 # waic
 waicOcc <- waicOcc(out)
-waicOcc <- data.frame(waicOcc)
-colnames(waicOcc) <- "val"
 
-waicOcc <- waicOcc %>% 
-  mutate(param = rownames(waicOcc))
+elpd <- waicOcc[1]
+pd <- waicOcc[2]
+waic <- waicOcc[3]
 
-waicOcc <- waicOcc %>% 
-  pivot_wider(names_from = param, values_from = val)
+df <- as.data.frame(cbind(elpd, pd, waic))
 
 ####################################
 #summary samples
 psiCovs <- MCMCsummary(out$beta.samples)
 
-rhat <- data.frame(out$rhat$beta)
-colnames(rhat) <- "rhat"
+rhat <- out$rhat$beta
 
 # Merging model output
 psiCovs <- psiCovs %>% 
-  mutate(Rhat = rhat$rhat,
-         elpd = waicOcc$elpd,
-         pd = waicOcc$pD,
-         waic = waicOcc$WAIC,
+  mutate(Rhat = rhat,
+         elpd = df$elpd,
+         pd = df$pD,
+         waic = df$WAIC,
          species_name = species_name)
 
 output_file <- write.csv(out, file = paste0("/work/chowdhus/ModelSummary_", 
