@@ -1,11 +1,11 @@
 #!/bin/bash
 
-#SBATCH --job-name=04.ModelSummary
+#SBATCH --job-name=03.occ_model_carabid
 #SBATCH --chdir=/home/chowdhus/occ_model_de
 #SBATCH --output=/work/%u/%x-%A-%a.out
-#SBATCH --time=1-00:00:00
+#SBATCH --time=2-00:00:00
 
-#SBATCH --mem-per-cpu=4G
+#SBATCH --mem-per-cpu=64G
 
 module load foss/2022b R/4.2.2
 
@@ -15,4 +15,4 @@ array_or_job_id=${SLURM_ARRAY_JOB_ID:-$SLURM_JOB_ID}
 output_dir="/work/$USER/$SLURM_JOB_NAME"
 mkdir -p "$output_dir"
 
-Rscript /home/chowdhus/occ_model_de/04.ModelSummary.R "$species" "$output_dir"
+Rscript /home/chowdhus/occ_model_de/03.occ_model_carabid.R "$species" "$output_dir"

@@ -69,3 +69,10 @@ data/Santangeli_etal_Data_Script/Santangeli_etal_Data_Script/HMSC_models/plants/
 data/Santangeli_etal_Data_Script/Santangeli_etal_Data_Script/SiteMatchingBirdExample.R
 data/~$Species for test.xlsx
 *.txt
+
+
+# Data/output files
+/data/
+/output/
+/prev/
+species.csv

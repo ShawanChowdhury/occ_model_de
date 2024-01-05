@@ -4,22 +4,28 @@ library(tidyverse)
 ###########################################################
 # Importing and combining data
 ###########################################################
+# Earlier, using the intersect toolbar in ArcGIS, I grouped all the carabid distribution records
+# into MTB quadrants. We can also do it in R, but ArcGIS is faster.
 # Import data
 complete_data <- read_delim("data/carabid_mtb.txt")
 
 # Data organising
+# Changing coloumn names
 colnames(complete_data)
-
 colnames(complete_data)[3] <- "site"
 
+# Selecting required variables
 complete_data <- complete_data %>% 
   select(site, species, lon, lat, day, month, year, source)
 
+# Exporting revised data [to manually check if everything looks okay]
 write_csv(complete_data, "data/carabid_initial_data_up.csv")
 
 # Importing revised data
 complete_data <- read_csv("data/carabid_initial_data_up.csv")
 
+# The number of species occurrence records is quite low for every year, so I am
+# grouping them in 12-year study period
 # Subset by year
 complete_data <- subset(complete_data, year>=1974 & year<2022)
 
@@ -47,7 +53,6 @@ complete_data <- complete_data %>%
 ###########################################################
 # Add site information
 #I have already assigned the MTB grid cells as site, so I don't need to create site information
-#complete_data$site <- paste(complete_data$lon, complete_data$lat, sep="-") # short cut
 
 # Add visit information
 complete_data$date <- paste(complete_data$day, complete_data$month, complete_data$year_range, sep="-")
@@ -55,7 +60,7 @@ complete_data$date <- paste(complete_data$day, complete_data$month, complete_dat
 # Define a visit as site + date
 complete_data$visit <- paste(complete_data$site, complete_data$date, sep="_")
 
-#lets look at how many unique surveys (i.e., visits) we have
+# How many unique surveys (i.e., visits)?
 surveys <- unique(complete_data[,c("visit","site","lon","lat","day","month","year_range")])
 
 # How many grids were surveyed in at least two years?
@@ -85,34 +90,8 @@ summary(speciesSummary)
 # use sites visited in at least two years
 complete_data <- complete_data %>% filter(site %in% surveyYears$site[surveyYears$nuYears>1]) 
 
-# sub_data <- complete_data %>% 
-#   filter(species %in% c("Carabus nitens",
-#                         "Abax parallelus",
-#                         "Carabus convexus",
-#                         "Carabus arcensis",
-#                         "Agonum ericeti",
-#                         "Amara famelica",
-#                         "Amara infima",
-#                         "Poecilus versicolor",
-#                         "Harpalus rufipes",
-#                         "Abax parallelepipedus",
-#                         "Carabus auronitens",
-#                         "Bembidion lampros",
-#                         "Bembidion properans",
-#                         "Trechus quadristriatus",
-#                         "Poecilus cupreus",
-#                         "Zabrus tenebrioides",
-#                         "Pterostichus melanarius"
-#   ))
-
 # Exporting output
 write_rds(complete_data, "data/complete_data_carabid.rds")
-
-# #lets decide which species we want to analyse - we have to remove very rare species
-# selectSpecies <- subset(speciesSummary, nuRecs > 0)
-
-# Exporting output
-# write_rds(sub_data, "data/sub_data.rds")
 
 # Creating long list 
 listlengthDF <- complete_data %>%
@@ -126,9 +105,10 @@ occMatrix[1:10, 1:10]
 occMatrix[occMatrix>1] <- 1 # make binary
 occMatrix[is.na(occMatrix)] <- 0 
 
-# check the detection - non detection data aligns with the visit data
+# check the detection - non detection data aligns with the visit data 
+# [sometimes, it might show 'False' even if they align perfectly, but the model
+# will work as long as they have the same number of rows]
 all(row.names(occMatrix) == listlengthDF$visit)
 
+# Exporting output
 write_rds(occMatrix, "data/occ_matrix_carabid.rds")
-
-#######################################

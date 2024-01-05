@@ -4,27 +4,43 @@ library(spOccupancy)
 library(MCMCvis)
 library(docopt)
 
-### get data #############################################
-visit_data <- read_rds("data/complete_data_test.rds")
+### Setting parameters for the HPC #############################################
+doc <- "usage: 03.occ_model_carabid.R <species> <output_dir>"
+opts <- docopt(doc)
+
+## read parameter file
+species <- read.csv(opts$species)
+
+## try to get task id
+task <- as.integer(Sys.getenv("SLURM_ARRAY_TASK_ID"))
+
+print(paste("task:", task))
+
+species_name <- species$species[[task]]
+
+print(paste("species_name:", species_name))
+print(paste("class(species_name):", class(species_name)))
+
+### Get data #############################################
+visit_data <- read_rds("data/complete_data_carabid.rds")
 
 visit_data <- visit_data %>%
-  group_by(visit, Year, yday, site, Month) %>%
-  summarize(nuSpecies = length(unique(Species))) %>%
+  group_by(visit, year_range, day, site, month) %>%
+  summarize(nuSpecies = length(unique(species))) %>%
   ungroup()
 
-#metadata for each visit
+# Metadata for each visit
+# The species binary matric
+occMatrix <- read_rds("data/occ_matrix_carabid.rds")
+# Each row is a visit, while each column is data for a species
 
-#the species binary matric
-occMatrix <- read_rds("data/occ_matrix_test.rds")
-#each row is a visit, while each column is data for a species
-
-#check the visit data fram and occ matrix align
+# Check the visit data fram and occ matrix align
 all(visit_data$visit==row.names(occMatrix))
-#this should be TRUE - if not, you need to rearrange the above objects
+# This should be TRUE - if not, you need to rearrange the above objects.
+# [sometimes, it might show 'False' even if they align perfectly, but the model
+# will work as long as they have the same number of rows]
 
-species_name <- "Aeshna grandis"
-
-#add on the focal species data for this task
+# Species data for this task
 visit_data$Species <- occMatrix[,species_name]
 
 # Checking presence and absence details
@@ -34,36 +50,33 @@ table(visit_data$Species)
 
 #for spOccupancy we need to format the data into a matrix
 
-#how many visits per site per year
+# How many visits per site per year
 visitSummary <- visit_data %>%
-  group_by(site, Year) %>%
+  group_by(site, year_range) %>%
   summarise(nuVisits = length(visit))
 
-#some sampled up to 174 times!!
-#subsample at most 10 visits per year at any specific site
+# Subsample at most 10 visits per year at any specific site
 visit_data <- visit_data %>%
-  group_by(site, Year) %>%
+  group_by(site, year_range) %>%
   mutate(mySample = ifelse(length(visit)>10, 10, length(visit))) %>% 
   sample_n(.,size=unique(mySample)) %>%
   ungroup()
 
-#need to make visit be indexed from i to n within each site, year, and month
+# Need to make visit be indexed from integer to numeric within each site, year, and month
 visit_data <- visit_data %>%
-  group_by(site, Year) %>%
+  group_by(site, year_range) %>%
   mutate(visit = as.numeric(as.factor(visit)))%>%
   ungroup() 
 
-visit_data$yearIndex <- as.numeric(visit_data$Year)
-visit_data$monthIndex <- as.numeric(visit_data$Month)
+visit_data$yearIndex <- as.numeric(visit_data$year_range)
+visit_data$monthIndex <- as.numeric(visit_data$month)
 
-#make response into the matrix
+# Make response into the matrix
 y <- reshape2::acast(visit_data, site ~ yearIndex ~ visit,
                      value.var = "Species")
 dim(y)
 
-### occ covariates #################################
-
-#occupancy  covariats
+### Occupancy covariates #################################
 siteDF <- data.frame(site = dimnames(y)[[1]])
 yearMatrix <- expand.grid(site =siteDF$site,
                           yearIndex = unique(visit_data$yearIndex))
@@ -71,11 +84,7 @@ yearMatrix <- expand.grid(site =siteDF$site,
 occ.covs <- list(site = as.numeric(as.factor(siteDF$site)),
                  year = reshape2::acast(yearMatrix, site ~ yearIndex, value.var = "yearIndex"))
 
-### det covariates ##################################
-
-#detection covariates
-# visit_data$monthIndex <- as.numeric(as.factor(visit_data$Month))
-# visit_data$yearIndex <- as.numeric(as.factor(visit_data$Year))
+### Detection covariates ##################################
 visit_data$nuSpecies <- ifelse(visit_data$nuSpecies==1,"single",
                                ifelse(visit_data$nuSpecies %in% 2:3, "short", "long"))
 
@@ -89,8 +98,8 @@ data.list <- list(y = y,
 
 print("data ready")
 
-### model setting ##########################################
-
+### Model setting ##########################################
+# Setting priors
 z.inits <- apply(y, c(1, 2), 
                  function(a){ max(a, na.rm = TRUE)}) 
 z.inits[is.infinite(z.inits)] <- 0
@@ -103,19 +112,19 @@ all.inits <- list(beta = 0, # occurrence coefficients
 all.priors <- list(beta.normal = list(mean = 0, var = 2.72), 
                    alpha.normal = list(mean = 0, var = 2.72),
                    sigma.sq.psi.ig = list(a = 0.1, b = 0.1))
-
+# Setting model syntax
 n.chains <- 3
-n.batch <- 100
-batch.length <- 25
+n.batch <- 1500
+batch.length <- 100
 (n.samples <- n.batch * batch.length) 
 #n.samples <- 50000
 n.burn <- n.samples*3/4
-n.thin <- 10
+n.thin <- 30
 ar1 <- FALSE
-n.report <- 1000
+n.report <- 10000
 
-###non sp trend run ##########################################
-
+#############################################
+# Main model
 det.formula <- ~ (1|year) + (1|month) + nuSpecies
 occ.formula <- ~ year + (1|site)
 
@@ -133,28 +142,5 @@ out <- tPGOcc(occ.formula = occ.formula,
               n.chains = n.chains,
               n.report = n.report)
 
-
-write_rds(out, "output/test.rds")
-
-# print summary
-summary <- summary(out)
-
-# waic
-waicOcc(out)
-
-#summary samples
-psiCovs <- MCMCsummary(out$beta.samples)
-
-rhat <- as.data.frame(out$rhat$beta)
-colnames(rhat) <- "rhat"
-
-psiCovs <- psiCovs %>% 
-  mutate(rhat = rhat)
-
-
-output_file <- saveRDS(psiCovs, file = paste0("MCMC_summary_", species_name,".rds"))
-
-ppc.out <- ppcOcc(out, fit.stat = 'freeman-tukey', group = 1)
-summary(ppc.out)
-
-output_file <- saveRDS(ppc.out, file = paste0("ppcOcc_summary_", species_name,".rds"))
+# Exporting output
+output_file <- saveRDS(out, file = paste0("/work/chowdhus/ModelOutput_", 
