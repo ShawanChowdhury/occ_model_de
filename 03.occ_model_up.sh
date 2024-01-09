@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=03.occ_model_carabid
+#SBATCH --job-name=03.occ_model_carabid_1yr
 #SBATCH --chdir=/home/chowdhus/occ_model_de
 #SBATCH --output=/work/%u/%x-%A-%a.out
 #SBATCH --time=2-00:00:00
@@ -15,4 +15,4 @@ array_or_job_id=${SLURM_ARRAY_JOB_ID:-$SLURM_JOB_ID}
 output_dir="/work/$USER/$SLURM_JOB_NAME"
 mkdir -p "$output_dir"
 
-Rscript /home/chowdhus/occ_model_de/03.occ_model_carabid.R "$species" "$output_dir"
+Rscript /home/chowdhus/occ_model_de/03.occ_model_carabid_1yr.R "$species" "$output_dir"

@@ -27,12 +27,14 @@ complete_data <- read_csv("data/carabid_initial_data_up.csv")
 # The number of species occurrence records is quite low for every year, so I am
 # grouping them in 12-year study period
 # Subset by year
-complete_data <- subset(complete_data, year>=1974 & year<2022)
+complete_data <- subset(complete_data, year>=1992 & year<2022)
+
+colnames(complete_data)[7] <- "year_range"
 
 # # Grouping data by years
-complete_data <- complete_data %>%
-  mutate(year_range=cut(year, breaks=c(1973, 1985, 1997, 2009, 2021),
-                        labels=c("1","2","3", "4")))
+# complete_data <- complete_data %>%
+#   mutate(year_range=cut(year, breaks=c(1973, 1985, 1997, 2009, 2021),
+#                         labels=c("1","2","3", "4")))
 
 complete_data$lon <- as.numeric(complete_data$lon)
 complete_data$lat <- as.numeric(complete_data$lat)
@@ -54,7 +56,7 @@ complete_data <- complete_data %>%
 # Add site information
 #I have already assigned the MTB grid cells as site, so I don't need to create site information
 
-# Add visit information
+# Add visit information [keep year here]
 complete_data$date <- paste(complete_data$day, complete_data$month, complete_data$year_range, sep="-")
 
 # Define a visit as site + date

@@ -5,7 +5,7 @@ library(MCMCvis)
 library(docopt)
 
 ### Setting parameters for the HPC #############################################
-doc <- "usage: 03.occ_model_carabid.R <species> <output_dir>"
+doc <- "usage: 03.occ_model_carabid_1yr.R <species> <output_dir>"
 opts <- docopt(doc)
 
 ## read parameter file
@@ -126,7 +126,7 @@ n.report <- 10000
 #############################################
 # Main model
 det.formula <- ~ (1|year) + (1|month) + nuSpecies # Use the factor value of year
-occ.formula <- ~ year + (1|site) # Use the factor value of year
+occ.formula <- ~ (year - 1) + (1|site) # Use the factor value of year
 
 out <- tPGOcc(occ.formula = occ.formula,
               det.formula = det.formula,
@@ -143,4 +143,10 @@ out <- tPGOcc(occ.formula = occ.formula,
               n.report = n.report)
 
 # Exporting output
-output_file <- saveRDS(out, file = paste0("/work/chowdhus/ModelOutput_"))
+rhat <- out$rhat$beta
+
+if(rhat <= 1.1){
+  output_file <- saveRDS(out, 
+                         file = paste0("/work/chowdhus/ModelOutput/ModelOutput_"))
+}
+

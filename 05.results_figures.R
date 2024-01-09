@@ -139,3 +139,52 @@ ggplot(trend_trait, aes(wings, mean_trend, col = wings)) +
   geom_smooth(method = "lm") + 
   xlab("Body size") + ylab("Long-term trend")
 
+############################
+# Number of records vs trends
+trend_trait <- read_csv("output/trend_trait_carabid.csv")
+
+# Quantile: 1.0  16.5  51.0 133.0 382.0
+trend_trait <- trend_trait %>%
+  filter(yr1 > 0) %>% 
+  mutate(yr1_group = cut(yr1, breaks=c(0, 17, 40, 70, 133, 383),
+                       labels=c("Very low","Low", "Medium", "High", "Very High")))
+
+g1 <- ggplot(trend_trait, aes(yr1, mean_trend)) +
+  geom_point(aes(col = significance_status), alpha = 0.5) +
+  geom_smooth(method = "lm") +
+  theme_classic() + 
+  xlab("Number of occurrence records (1974-1985)") + ylab("Long-term trend") +
+  scale_color_manual(values = c("deepskyblue", "darkgoldenrod1", "skyblue3")) +
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+g2 <- ggplot(trend_trait, aes(yr2, mean_trend)) +
+  geom_point(aes(col = significance_status), alpha = 0.5) +
+  geom_smooth(method = "lm") +
+  theme_classic() + 
+  xlab("Number of occurrence records (1986-1997)") + ylab("Long-term trend") +
+  scale_color_manual(values = c("deepskyblue", "darkgoldenrod1", "skyblue3")) +
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+g3 <- ggplot(trend_trait, aes(yr3, mean_trend)) +
+  geom_point(aes(col = significance_status), alpha = 0.5) +
+  geom_smooth(method = "lm") +
+  theme_classic() + 
+  xlab("Number of occurrence records (1998-2009)") + ylab("Long-term trend") +
+  scale_color_manual(values = c("deepskyblue", "darkgoldenrod1", "skyblue3")) +
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+g4 <- ggplot(trend_trait, aes(yr4, mean_trend)) +
+  geom_point(aes(col = significance_status), alpha = 0.5) +
+  geom_smooth(method = "lm") +
+  theme_classic() + 
+  xlab("Number of occurrence records (2010-2021)") + ylab("Long-term trend") +
+  scale_color_manual(values = c("deepskyblue", "darkgoldenrod1", "skyblue3")) +
+  theme(legend.title = element_blank(),
+        legend.position = "none")
+
+cowplot::plot_grid(g1, g2, g3, g4)
+
+ggsave("output/yearr_trend.png")
