@@ -5,7 +5,7 @@ library(MCMCvis)
 library(docopt)
 
 ### Setting parameters for the HPC #############################################
-doc <- "usage: 03.occ_model_carabid_1yr.R <species> <output_dir>"
+doc <- "usage: 03.occ_model_carabid_10yr.R <species> <output_dir>"
 opts <- docopt(doc)
 
 ## read parameter file
@@ -22,7 +22,7 @@ print(paste("species_name:", species_name))
 print(paste("class(species_name):", class(species_name)))
 
 ### Get data #############################################
-visit_data <- read_rds("data/complete_data_carabid_1yr.rds")
+visit_data <- read_rds("data/complete_data_carabid_10yr.rds")
 
 visit_data <- visit_data %>%
   group_by(visit, year_group, day, site, month) %>%
@@ -31,7 +31,7 @@ visit_data <- visit_data %>%
 
 # Metadata for each visit
 # The species binary matric
-occMatrix <- read_rds("data/occ_matrix_carabid_1yr.rds")
+occMatrix <- read_rds("data/occ_matrix_carabid_10yr.rds")
 # Each row is a visit, while each column is data for a species
 
 # Check the visit data fram and occ matrix align
@@ -147,7 +147,7 @@ out <- tPGOcc(occ.formula = occ.formula,
 rhat <- out$rhat$beta
 
 output_file <- saveRDS(out, 
-                       file = paste0("/work/chowdhus/ModelOutput/1yr/ModelOutput_", 
+                       file = paste0("/work/chowdhus/ModelOutput/10yr/ModelOutput_", 
                                      species_name,".rds"))
 
 #############################################
@@ -177,5 +177,5 @@ psiCovs <- psiCovs %>%
          species_name = species_name)
 
 # Exporting output
-output_file <- write.csv(psiCovs, file = paste0("/work/chowdhus/ModelOutput/1yr/ModelSummary_", 
+output_file <- write.csv(psiCovs, file = paste0("/work/chowdhus/ModelOutput/10yr/ModelSummary_", 
                                                 species_name,".csv"))
