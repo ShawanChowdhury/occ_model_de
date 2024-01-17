@@ -5,6 +5,7 @@ library(lmerTest)
 library(nimble)  # occupancy models
 library(ggmcmc)
 library(MCMCvis)
+library(docopt)
 
 ### Setting parameters for the HPC #############################################
 doc <- "usage: 02.03.occ_model_fungi.R <species_fungi> <output_dir>"
