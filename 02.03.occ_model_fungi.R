@@ -8,18 +8,18 @@ library(MCMCvis)
 library(docopt)
 
 ### Setting parameters for the HPC #############################################
-doc <- "usage: 02.03.occ_model_fungi.R <species_fungi> <output_dir>"
+doc <- "usage: 02.03.occ_model_fungi.R <species> <output_dir>"
 opts <- docopt(doc)
 
 ## read parameter file
-species_fungi <- read.csv(opts$species_fungi)
+species <- read.csv(opts$species)
 
 ## try to get task id
 task <- as.integer(Sys.getenv("SLURM_ARRAY_TASK_ID"))
 
 print(paste("task:", task))
 
-species_name <- species_fungi$species_fungi[[task]]
+species_name <- species$species[[task]]
 
 print(paste("species_name:", species_name))
 print(paste("class(species_name):", class(species_name)))
