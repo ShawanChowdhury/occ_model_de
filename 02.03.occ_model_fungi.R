@@ -1,5 +1,4 @@
 # Loading required libraries
-library(RODBC)
 library(tidyverse)
 library(data.table)
 library(lmerTest)
