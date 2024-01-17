@@ -4,10 +4,10 @@ library(ggplot2)
 
 ####################################
 # Merge csvs
-input_folder <- "output/ModelSummary/"
+input_folder <- "output/ModelSummary/2yr/"
 files <- dir(input_folder, "^.*\\.csv$", full.names = TRUE)
 merged <- plyr::ldply(files, readr::read_csv)
-write.csv(merged, "output/model_summary.csv")
+write.csv(merged, "output/model_summary_2yr.csv")
 
 ####################################
 # Number of records vs Rhat value

@@ -1,10 +1,12 @@
 The followings are description for each R script.
 
-01.data_prep_carabid.R: Data preparation for occupancy model
+01.01.data_prep_carabid_1yr.R: Data preparation for occupancy model (in one year combination)
 
-02.occ_model_pc_carabid.R: Data preparation to fit the spOccupancy requirement and running it in the local computer
+01.02.data_prep_carabid_2yr.R: Data preparation for occupancy model (in one year combination)
 
-03.occ_model_carabid.R: Data preparation to fit the spOccupancy requirement and running it in the HPC
+03.01.occ_model_carabid.R_1yr: Data preparation to fit the spOccupancy requirement and running it in the HPC (in one year combination)
+
+03.02.occ_model_carabid.R_2yr: Data preparation to fit the spOccupancy requirement and running it in the HPC (in one year combination)
 
 04.model_summary.R: Calculating the model summaries
 
