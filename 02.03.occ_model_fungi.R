@@ -1,11 +1,11 @@
-# Identifying if we have all the required R packages
-list.of.packages <- c("RODBC", "tidyverse", "data.table", "lmerTest", 
-                      "nimble", "ggmcmc", "MCMCvis")
-new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.packages)
-
-# Loading required packages
-lapply(list.of.packages, require, character.only=TRUE)
+# Loading required libraries
+library(RODBC)
+library(tidyverse)
+library(data.table)
+library(lmerTest)
+library(nimble)  # occupancy models
+library(ggmcmc)
+library(MCMCvis)
 
 ### Setting parameters for the HPC #############################################
 doc <- "usage: 02.03.occ_model_fungi.R <species_fungi> <output_dir>"
