@@ -149,26 +149,6 @@ out <- nimble::nimbleMCMC(code = modelcode,
                           samplesAsCodaMCMC = TRUE, 
                           monitors = c("mean.p","psi.fs"))
 
-#niter and nburnin will need to be increased for a serious run
-
-'Defining model
-Building model
-Setting data and initial values
-Running calculate on model
-  [Note] Any error reports that follow may simply reflect missing values in model variables.
-Checking model sizes and dimensions
-  [Note] This model is not fully initialized. This is not an error.
-         To see which variables are not initialized, use model$initializeInfo().
-         For more information on model initialization, see help(modelInitialization).
-Checking model calculations
-[Note] NAs were detected in model variables: a, logProb_a, sd.a, sd.eta, mean.p, logProb_mean.p, tau.a, tau.eta, intercept.p, lifted_d1_over_sqrt_oPtau_dot_a_cP, lifted_d1_over_sqrt_oPtau_dot_eta_cP, p, eta, logProb_eta, psi, logProb_z, Py, logProb_y.
-[Note] Infinite values were detected in model variables: logProb_sd.a, logProb_sd.eta.
-Compiling
-  [Note] This may take a minute.
-  [Note] Use 'showCompilerOutput = TRUE' to see C++ compilation details.
-'
-printErrors()
-
 saveRDS(out, file = paste0("/work/chowdhus/ModelOutput/fungi/ModelOutput_", 
                                      species_name,".rds"))
 
