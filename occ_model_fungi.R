@@ -8,7 +8,7 @@ library(MCMCvis)
 library(docopt)
 
 ### Setting parameters for the HPC #############################################
-doc <- "usage: 02.03.occ_model_fungi.R <species> <output_dir>"
+doc <- "usage: occ_model_fungi.R <species> <output_dir>"
 opts <- docopt(doc)
 
 ## read parameter file
