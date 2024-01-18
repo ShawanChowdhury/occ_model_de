@@ -13,9 +13,42 @@ rm(list = ls())
 # Importing data
 load("H:/DriverAnalysis/occ_model_de/data/fungi_all.RData")
 
-# Checking species names
+length(unique(fungi.all$Vollname))
+# 14624
 head(sort(unique(fungi.all$Vollname)), 100)
 
+index_var <- grepl(" var. ",fungi.all$Vollname, fixed = T)
+index_subsp <- grepl(" subsp. ",fungi.all$Vollname, fixed = T)
+
+fungi.all <- fungi.all %>% 
+  mutate(Species = case_when(
+    index_var ~ paste(tstrsplit(Vollname, " ", fixed=T)[[1]],
+                      tstrsplit(Vollname, " ", fixed=T)[[2]],
+                      tstrsplit(Vollname, " ", fixed=T)[[3]],
+                      tstrsplit(Vollname, " ", fixed=T)[[4]],
+                      sep=" "),
+    index_subsp ~ paste(tstrsplit(Vollname, " ", fixed=T)[[1]],
+                        tstrsplit(Vollname, " ", fixed=T)[[2]],
+                        tstrsplit(Vollname, " ", fixed=T)[[3]],
+                        tstrsplit(Vollname, " ", fixed=T)[[4]],
+                        sep=" "),
+    .default = paste(tstrsplit(Vollname, " ", fixed=T)[[1]],
+                     tstrsplit(Vollname, " ", fixed=T)[[2]],
+                     sep=" ")))
+head(fungi.all$Species,100)
+unique(fungi.all$Species[grepl(" var. ",fungi.all$Species, fixed = T)])
+unique(fungi.all$Species[grepl(" subsp. ",fungi.all$Species, fixed = T)])
+
+###########################################
+# Filtering species of interests
+species_169 <- read_csv("data/species.csv")
+
+fungi.all <- dplyr::left_join(species_169, fungi.all, by = "Species")
+
+fungi.all$Vollname <- NULL
+colnames(fungi.all)[1] <- "Vollname"
+
+###########################################
 # Changing grid details
 names(fungi.all)[names(fungi.all)=="MTB"] <- "MTBQ"
 fungi.all$MTB <- as.numeric(tstrsplit(fungi.all$MTBQ, ",", fixed=T)[[1]])
