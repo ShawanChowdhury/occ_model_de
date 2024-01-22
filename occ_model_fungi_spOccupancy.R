@@ -171,5 +171,5 @@ psiCovs <- psiCovs %>%
          species_name = species_name)
 
 # Exporting output
-output_file <- write.csv(psiCovs, file = paste0("/work/chowdhus/ModelOutput/2yr/ModelSummary_", 
+output_file <- write.csv(psiCovs, file = paste0("/work/chowdhus/ModelOutput/fungi/MCMCsummary_", 
                                                 species_name,".csv"))
