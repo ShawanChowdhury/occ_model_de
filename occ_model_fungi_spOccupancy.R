@@ -24,12 +24,8 @@ print(paste("class(species_name):", class(species_name)))
 ### Get data #############################################
 visit_data <- read_rds("data/complete_data_fungi.rds")
 
-colnames(visit_data)[2] <- "site"
-colnames(visit_data)[5] <- "visit"
-
-
 visit_data <- visit_data %>%
-  group_by(visit, year_group, day, site, month) %>%
+  group_by(visit, year_group, site) %>%
   summarize(nuSpecies = length(unique(species))) %>%
   ungroup()
 
@@ -73,7 +69,6 @@ visit_data <- visit_data %>%
   ungroup() 
 
 visit_data$yearIndex <- as.numeric(visit_data$year_group)
-visit_data$monthIndex <- as.numeric(visit_data$month)
 
 # Make response into the matrix
 y <- reshape2::acast(visit_data, site ~ yearIndex ~ visit,
@@ -92,8 +87,7 @@ occ.covs <- list(site = as.numeric(as.factor(siteDF$site)),
 visit_data$nuSpecies <- ifelse(visit_data$nuSpecies==1,"single",
                                ifelse(visit_data$nuSpecies %in% 2:3, "short", "long"))
 
-det.covs <- list(month = reshape2::acast(visit_data, site ~ yearIndex ~ visit, value.var = "monthIndex"),
-                 year_group = reshape2::acast(visit_data, site ~ yearIndex ~ visit, value.var = "yearIndex"),
+det.covs <- list(year_group = reshape2::acast(visit_data, site ~ yearIndex ~ visit, value.var = "yearIndex"),
                  nuSpecies = reshape2::acast(visit_data, site ~ yearIndex ~ visit, value.var = "nuSpecies"))
 
 data.list <- list(y = y, 
@@ -130,8 +124,8 @@ n.report <- 10000
 
 #############################################
 # Main model
-det.formula <- ~ (1|year_group) + (1|month) + nuSpecies # Use the factor value of year
-occ.formula <- ~ year_group + (1|site) # Use the factor value of year
+det.formula <- ~ (1|year_group) + nuSpecies # Use the factor value of year
+occ.formula <- ~ (1 - year_group) + (1|site) # Use the factor value of year
 
 out <- tPGOcc(occ.formula = occ.formula,
               det.formula = det.formula,
