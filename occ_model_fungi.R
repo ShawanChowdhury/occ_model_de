@@ -159,15 +159,3 @@ MCMCsummary <- MCMCsummary(object = out, round = 4)
 #remaining rows are estimates of the proportion of occupied sites in each year
 saveRDS(MCMCsummary, file = paste0("/work/chowdhus/ModelOutput/fungi/MCMCsummary_", 
                                    species_name,".rds"))
-
-# Extracting summarised values
-mcmc <- as.data.frame(MCMCsummary)
-mcmc <- mcmc %>% 
-  mutate(species = species_name) %>% 
-  group_by(species) %>% 
-  summarise(mean_rhat = mean(Rhat)) %>% 
-  ungroup()
-
-# Exporting output
-write_csv(psiCovs, file = paste0("/work/chowdhus/ModelOutput/fungi/mcmc_sum_", 
-                                 species_name,".csv"))

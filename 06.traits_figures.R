@@ -7,7 +7,10 @@ library(emmeans)
 library(car)
 
 # Reading data file
-data <- read_csv("output/trend_trait_carabid.csv")
+data <- read_csv("output/trend_trait_carabid_2yr.csv")
+
+data <- data %>% 
+  filter(!is.na(species))
 
 # Quantile of body size: 2, 4.5, 7, 10.5, 37
 data <- data %>%
@@ -31,7 +34,7 @@ write_csv(df1, "output/trait_significance.csv")
 
 #######################################
 data_re <- within(data, b <- relevel(size_type, ref = "Medium"))
-data_re <- within(data_re, c <- relevel(trophicLevel, ref = "Herbivore"))
+data_re <- within(data_re, c <- relevel(trophicLevel, ref = "Predator"))
 data_re <- within(data_re, d <- relevel(habitatPref, ref = "Open"))
 data_re <- within(data_re, e <- relevel(wings, ref = "Dimorphic"))
 
@@ -54,33 +57,33 @@ data_long <- data %>%
                cols = c("wings", "trophicLevel", "size_type", "habitatPref"),
                values_to = "val")
 
-ggplot(data_long, aes(mean_trend, val)) +
-  geom_boxplot(outlier.shape = NA) +
-  geom_point(position = position_jitter(width = 0.01), alpha = 0.3, aes(col = significance_status)) +
-  theme_classic() + xlab("Long-term trends") + ylab("") +
-  scale_color_manual(values = c("deepskyblue", "darkgoldenrod1", "skyblue3")) +
-  theme(legend.title = element_blank(), legend.position = "top")
-
-ggplot(data, aes(mean_trend, size_type)) +
-  geom_boxplot(outlier.shape = NA) +
-  geom_point(position = position_jitter(width = 0.01), alpha = 0.3, aes(col = significance_status)) +
-  theme_classic() + xlab("Long-term trends") + ylab("") +
-  scale_color_manual(values = c("deepskyblue", "darkgoldenrod1", "skyblue3")) +
-  theme(legend.title = element_blank(), legend.position = "top")
+# ggplot(data_long, aes(mean_trend, val)) +
+#   geom_boxplot(outlier.shape = NA) +
+#   geom_point(position = position_jitter(width = 0.01), alpha = 0.3, aes(col = significance_status)) +
+#   theme_classic() + xlab("Long-term trends") + ylab("") +
+#   scale_color_manual(values = c("deepskyblue", "darkgoldenrod1", "skyblue3")) +
+#   theme(legend.title = element_blank(), legend.position = "top")
+# 
+# ggplot(data, aes(mean_trend, size_type)) +
+#   geom_boxplot(outlier.shape = NA) +
+#   geom_point(position = position_jitter(width = 0.01), alpha = 0.3, aes(col = significance_status)) +
+#   theme_classic() + xlab("Long-term trends") + ylab("") +
+#   scale_color_manual(values = c("deepskyblue", "darkgoldenrod1", "skyblue3")) +
+#   theme(legend.title = element_blank(), legend.position = "top")
 
 ggplot(data, aes(meanSize, mean_trend)) +
-  geom_point(alpha = 0.5, aes(col = significance_status)) +
+  geom_point(alpha = 0.5, aes(col = trend_status)) +
   theme_classic() + xlab("Body size (mm)") + ylab("Long-term trends") +
-  scale_color_manual(values = c("deepskyblue", "darkgoldenrod1", "skyblue3")) +
+  scale_color_manual(values = c("darkgoldenrod1", "skyblue3")) +
   theme(legend.title = element_blank(), legend.position = "top") + 
   geom_smooth(method = "lm")
 
 
-ggplot(data_long, aes(mean_trend, val)) +
-  geom_boxplot() +
-  theme_classic() + xlab("Long-term trends") + ylab("")
+# ggplot(data_long, aes(mean_trend, val)) +
+#   geom_boxplot() +
+#   theme_classic() + xlab("Long-term trends") + ylab("")
 
-ggsave("output/trend_trait.png")
+ggsave("output/trend_size_2yr.png")
 
 #################
 # Trend vs wing types
@@ -98,7 +101,7 @@ g2 <- ggplot(data, aes(trophicLevel, mean_trend)) +
 # Trend vs body size
 g3 <- ggplot(data, aes(meanSize, mean_trend)) +
   geom_point() +
-  theme_classic() + xlab("") + ylab("Long-term trends") +
+  theme_classic() + xlab("Mean body size") + ylab("Long-term trends") +
   geom_hline(yintercept=0, linetype="dashed", color = "red")
 
 # Trend vs habitat preference
@@ -110,4 +113,4 @@ g4 <- ggplot(data, aes(habitatPref, mean_trend)) +
 
 cowplot::plot_grid(g1, g2, g3, g4)
 
-ggsave("output/trend_trait.png")
+ggsave("output/trend_trait_2yr.png")

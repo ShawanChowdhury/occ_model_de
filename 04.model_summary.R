@@ -60,3 +60,41 @@ psiCovs <- psiCovs %>%
 # Exporting output
 output_file <- write.csv(psiCovs, file = paste0("/work/chowdhus/ModelSummary_", 
                                           species_name,".csv"))
+
+##########################################
+# Model summary [Fungi]
+sp <- read_csv("data/species.csv")
+
+# Importing the species file
+species <- unique(sp$species)
+
+# Importing model outputs [rds files]
+rds <- list.files(path = "output/fungi/", 
+                  pattern = "\\.rds$", recursive = TRUE, full.names = TRUE)
+rds <- rds[stringr::str_detect(rds, "MCMCsummary_")]
+
+# Creating an empty dataframe to merge the outputs
+df <- data.frame()
+
+for (i in species) {
+  print(i)
+  
+  sp_rds <- rds[stringr::str_detect(rds, i)]
+  
+  sp_rds <- read_rds(sp_rds)
+  
+  sp_rds_sum <- sp_rds %>% 
+    mutate(species = i, Rhat = mean(Rhat, na.rm = TRUE))
+  
+  sp_rds_sum <- sp_rds_sum[1,]
+  
+  df <- rbind(df, sp_rds_sum)
+  
+}
+
+# I don't need the rownames, so I am removing those.
+rownames(df) <- NULL
+
+# Export output
+write_csv(df, "output/model_summary_fungi_mean.csv")
+
