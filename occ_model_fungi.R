@@ -145,7 +145,7 @@ modelcode <- nimbleCode({
 out <- nimble::nimbleMCMC(code = modelcode, 
                           constants = nimble_const, data = nimble_data, 
                           inits = nimble_inits, nchains = 3, 
-                          niter = 50000, nburnin = 40000, thin = 30, 
+                          niter = 5000, nburnin = 4000, thin = 3, 
                           samplesAsCodaMCMC = TRUE, 
                           monitors = c("mean.p","psi.fs"))
 
