@@ -41,9 +41,9 @@ unique(fungi.all$Species[grepl(" subsp. ",fungi.all$Species, fixed = T)])
 
 ###########################################
 # Filtering species of interests
-species_256 <- read_csv("data/species_256.csv")
+species_131 <- read_csv("data/species_131.csv")
 
-fungi.all <- dplyr::left_join(species_256, fungi.all, by = "Species")
+fungi.all <- dplyr::left_join(species_131, fungi.all, by = "Species")
 
 fungi.all$Vollname <- NULL
 colnames(fungi.all)[1] <- "Vollname"
@@ -93,7 +93,7 @@ fungi.all.richness.MTB3 <- fungi.all %>% filter(Funddatum>1900 & Funddatum< 2023
   mutate(present_in_interval=1) %>%  
   group_by(Vollname) %>%
   summarize(n=length(Vollname)) %>% 
-  filter(n>=100)
+  filter(n>=50)
 
 fungi.all.richness.MTB3
 # 170 species occur in at least 100 MTBs and in at least 5 intervals

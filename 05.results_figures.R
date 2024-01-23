@@ -47,10 +47,11 @@ sp_rec_up <- dplyr::left_join(sp_rec, model_sum, by = c("species"))
 # Figures
 ####################################
 # Rhat and number of total occurrence records
+# Grouping data by years
 ggplot(sp_rec_up, aes(all_year, Rhat)) +
   geom_point(col = "blue", alpha = 0.3) + theme_classic() +
-  geom_smooth() + 
-  xlab("Number of occurrence records (all year)") + ylab("Rhat")
+  xlab("Number of occurrence records (all year)") +
+  geom_smooth()
 
 ggsave("output/Rhat_n_rec_2yr.png")
 

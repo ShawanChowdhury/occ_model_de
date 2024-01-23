@@ -98,3 +98,9 @@ rownames(df) <- NULL
 # Export output
 write_csv(df, "output/model_summary_fungi_mean.csv")
 
+####################################
+# Merge csvs [256 species]
+input_folder <- "output/fungi/256/"
+files <- dir(input_folder, "^.*\\.csv$", full.names = TRUE)
+merged <- plyr::ldply(files, readr::read_csv)
+write.csv(merged, "output/model_summary_fungi_256.csv")
