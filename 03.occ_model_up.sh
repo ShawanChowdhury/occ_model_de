@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=occ_model_fungi
+#SBATCH --job-name=occ_model_fungi_spOccupancy
 #SBATCH --chdir=/home/chowdhus/occ_model_de
 #SBATCH --output=/work/%u/%x-%A-%a.out
 #SBATCH --time=1-00:00:00
@@ -15,4 +15,4 @@ array_or_job_id=${SLURM_ARRAY_JOB_ID:-$SLURM_JOB_ID}
 output_dir="/work/$USER/$SLURM_JOB_NAME"
 mkdir -p "$output_dir"
 
-Rscript /home/chowdhus/occ_model_de/occ_model_fungi.R "$species" "$output_dir"
+Rscript /home/chowdhus/occ_model_de/occ_model_fungi_spOccupancy.R "$species" "$output_dir"
