@@ -142,6 +142,10 @@ out <- tPGOcc(occ.formula = occ.formula,
               n.report = n.report)
 
 # Exporting output
+output_file <- write_rds(out, file = paste0("/work/chowdhus/ModelOutput/fungi/Modelsummary_", 
+                                                species_name,".rds"))
+
+# Extracting Rhat value
 rhat <- out$rhat$beta
 
 #############################################
