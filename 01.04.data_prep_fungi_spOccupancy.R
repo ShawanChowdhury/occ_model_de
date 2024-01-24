@@ -33,9 +33,9 @@ unique(fungi.all$Species[grepl(" subsp. ",fungi.all$Species, fixed = T)])
 
 ###########################################
 # Filtering species of interests
-species_256 <- read_csv("data/species_256.csv")
+species_61 <- read_csv("data/species_61.csv")
 
-fungi.all <- dplyr::left_join(species_256, fungi.all, by = "Species")
+fungi.all <- dplyr::left_join(species_61, fungi.all, by = "Species")
 
 fungi.all$Vollname <- NULL
 colnames(fungi.all)[1] <- "Vollname"
