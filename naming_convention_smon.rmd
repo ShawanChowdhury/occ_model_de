@@ -1,0 +1,27 @@
+---
+title: "naming_conventions_sMon"
+output: html_document
+date: '2024-01-25'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+# Use the same name in all types of the models.
+
+Always use period when discussing the total study year (start-end; e.g., 1992-2021)
+
+File name: complete_data
+Site: site
+Visit: visit
+Year: year
+Day: day
+Month: month
+Date: date
+Longitude: lon
+Latitude: lat
+Year interval: year_bin
+Number of visits: n_visit

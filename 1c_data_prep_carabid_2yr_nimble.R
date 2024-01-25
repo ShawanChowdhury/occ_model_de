@@ -1,26 +1,6 @@
 # Loading libraries
 library(tidyverse)
 
-###########################################################
-# Importing and combining data
-###########################################################
-# Earlier, using the intersect toolbar in ArcGIS, I grouped all the carabid distribution records
-# into MTB quadrants. We can also do it in R, but ArcGIS is faster.
-# Import data
-complete_data <- read_delim("data/carabid_mtb.txt")
-
-# Data organising
-# Changing coloumn names
-colnames(complete_data)
-colnames(complete_data)[3] <- "site"
-
-# Selecting required variables
-complete_data <- complete_data %>% 
-  select(site, species, lon, lat, day, month, year, source)
-
-# Exporting revised data [to manually check if everything looks okay]
-write_csv(complete_data, "data/carabid_initial_data_up.csv")
-
 # Importing revised data
 complete_data <- read_csv("data/carabid_initial_data_up.csv")
 
@@ -92,15 +72,6 @@ summary(speciesSummary)
 
 # use sites visited in at least two years
 complete_data <- complete_data %>% filter(site %in% surveyYears$site[surveyYears$nuYears>1]) 
-
-# Exporting output
-write_rds(complete_data, "data/complete_data_carabid_2yr.rds")
-
-# Creating long list 
-listlengthDF <- complete_data %>%
-  group_by(visit, year_group, day, site) %>%
-  summarize(nuSpecies = length(unique(species))) %>%
-  ungroup()
 
 # organize species matrix of detection-non detections in a given visit
 occMatrix <- reshape2::acast(complete_data, visit ~ species, value.var="year_group", fun=length) #default to length

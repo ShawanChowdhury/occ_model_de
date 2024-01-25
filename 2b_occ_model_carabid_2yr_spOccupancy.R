@@ -25,7 +25,7 @@ print(paste("class(species_name):", class(species_name)))
 visit_data <- read_rds("data/complete_data_carabid_2yr.rds")
 
 visit_data <- visit_data %>%
-  group_by(visit, year_group, day, site, month) %>%
+  group_by(visit, year_group, site, month) %>%
   summarize(nuSpecies = length(unique(species))) %>%
   ungroup()
 
@@ -127,7 +127,7 @@ n.report <- 10000
 #############################################
 # Main model
 det.formula <- ~ (1|year_group) + (1|month) + nuSpecies # Use the factor value of year
-occ.formula <- ~ year_group + (1|site) # Use the factor value of year
+occ.formula <- ~ factor(year_group) - 1 + (1|site) # Use the factor value of year
 
 out <- tPGOcc(occ.formula = occ.formula,
               det.formula = det.formula,
