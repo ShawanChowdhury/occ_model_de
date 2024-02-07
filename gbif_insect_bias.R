@@ -4,21 +4,7 @@ library(docopt)
 library(data.table)
 
 ### Setting parameters for the HPC #############################################
-doc <- "usage: gbif_insect_bias.R <species> <output_dir>"
-opts <- docopt(doc)
-
-## read parameter file
-species <- read.csv(opts$species)
-
-## try to get task id
-task <- as.integer(Sys.getenv("SLURM_ARRAY_TASK_ID"))
-
-print(paste("task:", task))
-
-species_name <- species$species[[task]]
-
-print(paste("species_name:", species_name))
-print(paste("class(species_name):", class(species_name)))
+doc <- "usage: gbif_insect_bias.R <output_dir>"
 
 ############################################
 # Reading data file
