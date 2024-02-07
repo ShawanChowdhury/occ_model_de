@@ -9,10 +9,10 @@
 
 module load foss/2022b R/4.2.2
 
-class="$1"
+species="$1"
 
 array_or_job_id=${SLURM_ARRAY_JOB_ID:-$SLURM_JOB_ID}
 output_dir="/work/$USER/$SLURM_JOB_NAME"
 mkdir -p "$output_dir"
 
-Rscript /home/chowdhus/occ_model_de/gbif_insect_bias.R "class" "$output_dir"
+Rscript /home/chowdhus/occ_model_de/gbif_insect_bias.R "species" "$output_dir"
