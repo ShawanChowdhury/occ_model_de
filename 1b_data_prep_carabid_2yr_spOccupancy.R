@@ -7,19 +7,19 @@ library(tidyverse)
 # Earlier, using the intersect toolbar in ArcGIS, I grouped all the carabid distribution records
 # into MTB quadrants. We can also do it in R, but ArcGIS is faster.
 # Import data
-complete_data <- read_delim("data/carabid_mtb.txt")
-
-# Data organising
-# Changing coloumn names
-colnames(complete_data)
-colnames(complete_data)[3] <- "site"
-
-# Selecting required variables
-complete_data <- complete_data %>% 
-  select(site, species, lon, lat, day, month, year, source)
-
-# Exporting revised data [to manually check if everything looks okay]
-write_csv(complete_data, "data/carabid_initial_data_up.csv")
+# complete_data <- read_delim("data/carabid_mtb.txt")
+# 
+# # Data organising
+# # Changing coloumn names
+# colnames(complete_data)
+# colnames(complete_data)[3] <- "site"
+# 
+# # Selecting required variables
+# complete_data <- complete_data %>% 
+#   select(site, species, lon, lat, day, month, year, source)
+# 
+# # Exporting revised data [to manually check if everything looks okay]
+# write_csv(complete_data, "data/carabid_initial_data_up.csv")
 
 # Importing revised data
 complete_data <- read_csv("data/carabid_initial_data_up.csv")
@@ -66,7 +66,7 @@ complete_data$date <- NULL
 complete_data$visit <- paste(complete_data$site, complete_data$year, sep="_")
 
 # How many unique surveys (i.e., visits)?
-surveys <- unique(complete_data[,c("visit","site","lon","lat","day","month","year_group")])
+surveys <- unique(complete_data[,c("visit","site","lon","lat","year_group")])
 
 # How many grids were surveyed in at least two years?
 # This is the threshold usually used in occupancy models
@@ -106,7 +106,7 @@ listlengthDF <- complete_data %>%
 
 # organize species matrix of detection-non detections in a given visit
 occMatrix <- reshape2::acast(complete_data, visit ~ species, value.var="year_group", fun=length) #default to length
-occMatrix[1:10, 1:10]
+# occMatrix[1:10, 1:10]
 occMatrix[occMatrix>1] <- 1 # make binary
 occMatrix[is.na(occMatrix)] <- 0 
 

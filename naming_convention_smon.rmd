@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## R Markdown
 
 # Use the same name in all types of the models.
+To be consistent across projects (or taxa), it is important to use the same names in all the analysis and discussion. Therefore, it would be helpful to discuss whenever talking about any specific topic.
 
 Always use period when discussing the total study year (start-end; e.g., 1992-2021)
 
@@ -24,4 +25,4 @@ Date: date
 Longitude: lon
 Latitude: lat
 Year interval: year_bin
-Number of visits: n_visit
+Number of visits: nvisit [no underscore (-)]
