@@ -12,6 +12,8 @@ doc <- "usage: gbif_insect_bias.R <output_dir>"
 
 gbif_data <- fread("/gpfs1/work/chowdhus/gbif_insect/occurrence.txt")
 
+NROW(gbif_data)
+
 # Selecting relevant rows
 gbif_data <- gbif_data %>% 
   select("class", "order", "family", "genus", "species", "decimalLongitude", 

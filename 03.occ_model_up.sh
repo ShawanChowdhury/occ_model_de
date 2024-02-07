@@ -5,7 +5,7 @@
 #SBATCH --output=/work/%u/%x-%A-%a.out
 #SBATCH --time=1-00:00:00
 
-#SBATCH --mem-per-cpu=128G
+#SBATCH --mem-per-cpu=256G
 
 module load foss/2022b R/4.2.2
 
