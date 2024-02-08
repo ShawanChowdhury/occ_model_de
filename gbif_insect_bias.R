@@ -12,6 +12,7 @@ doc <- "usage: gbif_insect_bias.R <output_dir>"
 
 gbif_data <- fread("/gpfs1/work/chowdhus/gbif_insect/occurrence.txt")
 
+# Number of occurrence records before cleaning
 NROW(gbif_data)
 
 # Selecting relevant rows
@@ -28,6 +29,32 @@ gbif_data <- gbif_data[!(is.na(gbif_data$decimalLatitude) | gbif_data$decimalLat
 
 # Removing duplicated records
 gbif_data <- gbif_data[!duplicated(gbif_data),]
+
+# Number of occurrence records after cleaning
+NROW(gbif_data)
+
+# Number of species after cleaning
+unique(gbif_data$species)
+
+###########################################
+# Number of occurrence records by species
+n_occ_sp <- gbif_data %>% 
+  group_by(species) %>% 
+  summarise(n = NROW(species))
+
+# Exporting output
+output_file <- write.csv(n_occ_sp, file = paste0("/work/chowdhus/gbif_insect/", 
+                                                          "n_occ_sp.csv"))
+
+###########################################
+# Number of yearly occurrence records by species
+n_occ_sp_year <- gbif_data %>% 
+  group_by(species, year) %>% 
+  summarise(n = NROW(species))
+
+# Exporting output
+output_file <- write.csv(n_occ_sp_year, file = paste0("/work/chowdhus/gbif_insect/", 
+                                                 "n_occ_sp_year.csv"))
 
 ###########################################
 # Growth of citizen science and museum data
