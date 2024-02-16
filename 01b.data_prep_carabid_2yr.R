@@ -7,49 +7,28 @@ library(tidyverse)
 # Earlier, using the intersect toolbar in ArcGIS, I grouped all the carabid distribution records
 # into MTB quadrants. We can also do it in R, but ArcGIS is faster.
 # Import data
-# complete_data <- read_delim("data/carabid_mtb.txt")
+# complete_data <- read_delim("data/com_mtb.txt")
 # 
 # # Data organising
 # # Changing coloumn names
 # colnames(complete_data)
-# colnames(complete_data)[3] <- "site"
+# colnames(complete_data)[11] <- "site"
 # 
 # # Selecting required variables
-# complete_data <- complete_data %>% 
-#   select(site, species, lon, lat, day, month, year, source)
+# complete_data <- complete_data %>%
+#   select(site, species, lon, lat, day, month, year, year_group)
 # 
 # # Exporting revised data [to manually check if everything looks okay]
-# write_csv(complete_data, "data/carabid_initial_data_up.csv")
+# write_csv(complete_data, "data/carabid_data_up.csv")
 
 # Importing revised data
-complete_data <- read_csv("data/carabid_initial_data_up.csv")
-
-# The number of species occurrence records is quite low for every year, so I am
-# grouping them in 2-year study period
-# Subset by year
-complete_data <- subset(complete_data, year>=1992 & year<2022)
-
-# Grouping data by years
-complete_data <- complete_data %>%
-  mutate(year_group=cut(year, seq(from = 1991, to = 2022, by = 2),
-                        labels=c("1","2","3", "4",
-                                 "5","6","7", "8",
-                                 "9","10","11", "12",
-                                 "13","14","15")))
+complete_data <- read_csv("data/carabid_data_up.csv")
 
 complete_data$lon <- as.numeric(complete_data$lon)
 complete_data$lat <- as.numeric(complete_data$lat)
 complete_data$month <- as.numeric(complete_data$month)
 complete_data$year_group <- as.numeric(complete_data$year_group)
 complete_data$day <- as.numeric(complete_data$day)
-
-###########################################################
-# Cleaning data
-###########################################################
-# Remove rows with missing data
-complete_data <- complete_data %>% 
-  filter(!is.na(lon)) %>%
-  filter(!is.na(lat))
 
 ###########################################################
 # Preparing data for model
@@ -59,14 +38,13 @@ complete_data <- complete_data %>%
 # Helge/Florian: For visit information, only use site and year, instead of day+month+year.
 
 # Add visit information [keep year here]
-# complete_data$date <- paste(complete_data$day, complete_data$month, complete_data$year, sep="-")
+complete_data$date <- paste(complete_data$day, complete_data$month, complete_data$year, sep="-")
 
 # Define a visit as site + date
-complete_data$date <- NULL
-complete_data$visit <- paste(complete_data$site, complete_data$year, sep="_")
+complete_data$visit <- paste(complete_data$site, complete_data$date, sep="_")
 
 # How many unique surveys (i.e., visits)?
-surveys <- unique(complete_data[,c("visit","site","lon","lat","year_group")])
+surveys <- unique(complete_data[,c("visit","site","lon","lat","day","month","year_group")])
 
 # How many grids were surveyed in at least two years?
 # This is the threshold usually used in occupancy models
@@ -100,7 +78,7 @@ write_rds(complete_data, "data/complete_data_carabid_2yr.rds")
 
 # Creating long list 
 listlengthDF <- complete_data %>%
-  group_by(visit, year_group, site) %>%
+  group_by(visit, year_group, day, month, site) %>%
   summarize(nuSpecies = length(unique(species))) %>%
   ungroup()
 

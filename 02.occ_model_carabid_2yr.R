@@ -5,7 +5,7 @@ library(MCMCvis)
 library(docopt)
 
 ### Setting parameters for the HPC #############################################
-doc <- "usage: 03.occ_model_carabid_1yr.R <species> <output_dir>"
+doc <- "usage: 02.occ_model_carabid_2yr.R <species> <output_dir>"
 opts <- docopt(doc)
 
 ## read parameter file
@@ -22,7 +22,7 @@ print(paste("species_name:", species_name))
 print(paste("class(species_name):", class(species_name)))
 
 ### Get data #############################################
-visit_data <- read_rds("data/complete_data_carabid_1yr.rds")
+visit_data <- read_rds("data/complete_data_carabid_2yr.rds")
 
 visit_data <- visit_data %>%
   group_by(visit, year_group, day, site, month) %>%
@@ -31,7 +31,7 @@ visit_data <- visit_data %>%
 
 # Metadata for each visit
 # The species binary matric
-occMatrix <- read_rds("data/occ_matrix_carabid_1yr.rds")
+occMatrix <- read_rds("data/occ_matrix_carabid_2yr.rds")
 # Each row is a visit, while each column is data for a species
 
 # Check the visit data fram and occ matrix align
@@ -69,7 +69,7 @@ visit_data <- visit_data %>%
   ungroup() 
 
 visit_data$yearIndex <- as.numeric(visit_data$year_group)
-visit_data$monthIndex <- as.numeric(visit_data$month)
+# visit_data$monthIndex <- as.numeric(visit_data$month)
 
 # Make response into the matrix
 y <- reshape2::acast(visit_data, site ~ yearIndex ~ visit,
@@ -88,8 +88,7 @@ occ.covs <- list(site = as.numeric(as.factor(siteDF$site)),
 visit_data$nuSpecies <- ifelse(visit_data$nuSpecies==1,"single",
                                ifelse(visit_data$nuSpecies %in% 2:3, "short", "long"))
 
-det.covs <- list(month = reshape2::acast(visit_data, site ~ yearIndex ~ visit, value.var = "monthIndex"),
-                 year_group = reshape2::acast(visit_data, site ~ yearIndex ~ visit, value.var = "yearIndex"),
+det.covs <- list(year_group = reshape2::acast(visit_data, site ~ yearIndex ~ visit, value.var = "yearIndex"),
                  nuSpecies = reshape2::acast(visit_data, site ~ yearIndex ~ visit, value.var = "nuSpecies"))
 
 data.list <- list(y = y, 
@@ -114,20 +113,20 @@ all.priors <- list(beta.normal = list(mean = 0, var = 2.72),
                    sigma.sq.psi.ig = list(a = 0.1, b = 0.1))
 
 # Setting model syntax
-n.chains <- 3
-n.batch <- 1500
-batch.length <- 100
+n.chains <- 2
+n.batch <- 150
+batch.length <- 10
 (n.samples <- n.batch * batch.length) 
 #n.samples <- 50000
 n.burn <- n.samples*3/4
-n.thin <- 30
+n.thin <- 3
 ar1 <- FALSE
-n.report <- 10000
+n.report <- 1000
 
 #############################################
 # Main model
-det.formula <- ~ (1|year_group) + (1|month) + nuSpecies # Use the factor value of year
-occ.formula <- ~ year_group + (1|site) # Use the factor value of year
+det.formula <- ~ (1|year_group) + nuSpecies # Use the factor value of year
+occ.formula <- ~ factor(year_group) - 1 + (1|site) # Use the factor value of year
 
 out <- tPGOcc(occ.formula = occ.formula,
               det.formula = det.formula,
@@ -143,16 +142,17 @@ out <- tPGOcc(occ.formula = occ.formula,
               n.chains = n.chains,
               n.report = n.report)
 
-# Exporting output
-rhat <- out$rhat$beta
-
 output_file <- saveRDS(out, 
-                       file = paste0("/work/chowdhus/ModelOutput/1yr/ModelOutput_", 
+                       file = paste0("/work/chowdhus/ModelOutput/2yr/ModelOutput_", 
                                      species_name,".rds"))
 
 #############################################
 # Model summary
 #############################################
+#gof
+ppc.out <- ppcOcc(out, fit.stat = 'freeman-tukey', group = 1)
+summary(ppc.out)
+
 # waic
 waicOcc <- waicOcc(out)
 
@@ -166,16 +166,18 @@ df <- as.data.frame(cbind(elpd, pd, waic))
 # Summary samples
 psiCovs <- MCMCsummary(out$beta.samples)
 
+# Exporting Rhat value from the model output
 rhat <- out$rhat$beta
+rhat <- as.data.frame(rhat)
 
 # Merging model output
 psiCovs <- psiCovs %>% 
-  mutate(Rhat = rhat,
+  mutate(Rhat = rhat$rhat,
          elpd = df$elpd,
          pd = df$pD,
          waic = df$WAIC,
          species_name = species_name)
 
 # Exporting output
-output_file <- write.csv(psiCovs, file = paste0("/work/chowdhus/ModelOutput/1yr/ModelSummary_", 
+output_file <- write.csv(psiCovs, file = paste0("/work/chowdhus/ModelOutput/2yr/ModelSummary_", 
                                                 species_name,".csv"))
