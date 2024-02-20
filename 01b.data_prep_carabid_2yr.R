@@ -65,13 +65,25 @@ surveySummary <- surveys %>%
 speciesSummary <- complete_data %>%
   filter(site %in% surveyYears$site[surveyYears$nuYears>1]) %>%
   group_by(species) %>%
-  summarise(nuRecs = length(source),
+  summarise(nuRecs = length(species),
             nuSites = length(unique(site)),
             nuYears = length(unique(year_group)))
 summary(speciesSummary)
 
-# use sites visited in at least two years
+# Use sites visited in at least two years
 complete_data <- complete_data %>% filter(site %in% surveyYears$site[surveyYears$nuYears>1]) 
+
+# Remove very rare species
+selectSpecies <- subset(speciesSummary, nuRecs > 49)
+
+# Filtering species with > 49 records
+species_list <- selectSpecies[, 1]
+
+# Exporting species list
+write_csv(species_list, "data/species_list.csv")
+
+# Combining dataframe
+complete_data <- dplyr::left_join(selectSpecies, complete_data, by = "species")
 
 # Exporting output
 write_rds(complete_data, "data/complete_data_carabid_2yr.rds")

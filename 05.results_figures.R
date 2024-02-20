@@ -7,32 +7,89 @@ library(ggplot2)
 input_folder <- "output/ModelSummary/2yr/"
 files <- dir(input_folder, "^.*\\.csv$", full.names = TRUE)
 merged <- plyr::ldply(files, readr::read_csv)
-write.csv(merged, "output/model_summary_2yr.csv")
+colnames(merged)[1] <- "year_range"
+
+# Removing species with Rhat > 1.1
+model_sum <- merged %>% 
+  filter(Rhat < 1.1) 
+
+species_list <- model_sum %>% 
+  group_by(species_name) %>% 
+  summarise(n = NROW(species_name)) %>% 
+  filter(n > 1) %>% 
+  select(species_name)
+
+model_sum <- dplyr::left_join(species_list, model_sum, by = "species_name")
+
+# Export output
+write.csv(model_sum, "output/model_summary_2yr.csv")
 
 ####################################
-# Number of records vs Rhat value
-# Importing required files
-data <- read_rds("data/complete_data_carabid_2yr.rds")
+# Mean trend by year-range
 model_sum <- read_csv("output/model_summary_2yr.csv")
-colnames(model_sum)[1] <- "species"
 
-# Total records
-sp_rec <- data %>% 
-  group_by(species) %>% 
-  summarise(all_year = NROW(species))
+# Modifying the dataframe
+model_sum$year_range <- as.character(model_sum$year_range)
+model_sum$group <- "Individual"
 
-# Records by year range
-# sp_rec_yr <- data %>% 
-#   group_by(species, year_range) %>% 
-#   summarise(rec = NROW(species))
+# Summary values
+mean_trend_yr <- model_sum %>% 
+  group_by(year_range) %>% 
+  summarise(mean = mean(mean),
+            sd = mean(sd),
+            lower_5 = mean(lower_5),
+            upper_95 = mean(upper_95),
+            Rhat = mean(Rhat)) %>% 
+  mutate(species_name = "All")
+
+# Adding new columns
+mean_trend_yr$group <- "All"
+
+# Combining dataframes
+model_sum <- rbind(model_sum, mean_trend_yr)
+
+# Export output
+write.csv(model_sum, "output/mean_trend_yr.csv")
+
+####################################
+# Overall mean trend by species
+model_sum <- read_csv("output/model_summary_2yr.csv")
+
+trend_sp <- model_sum %>% 
+  group_by(species_name) %>% 
+  summarise(mean = mean(mean),
+            sd = mean(sd),
+            lower_5 = mean(lower_5),
+            upper_95 = mean(upper_95),
+            Rhat = mean(Rhat))
+
+# Export output
+write.csv(trend_sp, "output/trend_sp.csv")
+
+####################################
+# # Number of records vs Rhat value
+# # Importing required files
+# data <- read_rds("data/complete_data_carabid_2yr.rds")
+# model_sum <- read_csv("output/model_summary_2yr.csv")
+# colnames(model_sum)[1] <- "species"
 # 
-# sp_rec_yr <- sp_rec_yr %>% 
-#   pivot_wider(names_from = 'year_range', values_from = 'rec')
+# # Total records
+# sp_rec <- data %>% 
+#   group_by(species) %>% 
+#   summarise(all_year = NROW(species))
 # 
-# colnames(sp_rec_yr) <- c("species", "yr1", "yr2", "yr3", "yr4")
-
-# Merging year-range and total records
-sp_rec_up <- dplyr::left_join(sp_rec, model_sum, by = c("species"))
+# # Records by year range
+# # sp_rec_yr <- data %>% 
+# #   group_by(species, year_range) %>% 
+# #   summarise(rec = NROW(species))
+# # 
+# # sp_rec_yr <- sp_rec_yr %>% 
+# #   pivot_wider(names_from = 'year_range', values_from = 'rec')
+# # 
+# # colnames(sp_rec_yr) <- c("species", "yr1", "yr2", "yr3", "yr4")
+# 
+# # Merging year-range and total records
+# sp_rec_up <- dplyr::left_join(sp_rec, model_sum, by = c("species"))
 
 # ####################################
 # # Selecting species with Rhat < 1.2
@@ -47,15 +104,17 @@ sp_rec_up <- dplyr::left_join(sp_rec, model_sum, by = c("species"))
 # Figures
 ####################################
 # Rhat and number of total occurrence records
-# Grouping data by years
-ggplot(sp_rec_up, aes(all_year, Rhat)) +
-  geom_point(col = "blue", alpha = 0.3) + theme_classic() +
-  xlab("Number of occurrence records (all year)") +
-  geom_smooth()
-
-ggsave("output/Rhat_n_rec_2yr.png")
+# # Grouping data by years
+# ggplot(sp_rec_up, aes(all_year, Rhat)) +
+#   geom_point(col = "blue", alpha = 0.3) + theme_classic() +
+#   xlab("Number of occurrence records (all year)") +
+#   geom_smooth()
+# 
+# ggsave("output/Rhat_n_rec_2yr.png")
 
 # Number of records (and survey quadrants) by year
+data <- read_rds("data/complete_data_carabid_2yr.rds")
+
 year_mtb <- data %>% 
   group_by(year) %>% 
   summarise(n = NROW(unique(site)))
@@ -87,11 +146,21 @@ ggplot(data, aes(lon, lat, col = year_group)) +
 
 ggsave("output/year-wise_rec_map_2yr.png")
 
-# Overall trend
-ggplot(sp_rec_up, aes(species, mean_trend)) +
-  geom_histogram() + xlab("") + ylab("") + theme_classic()
+####################################
+# Trend by year-range
 
-ggplot(model_sum_rec_up,aes(fct_reorder(species, mean_trend), mean_trend, fill = colour, col = colour)) +
+# Importing data
+mean_trend_yr <- read_csv("output/mean_trend_yr.csv")
+
+ggplot(mean_trend_yr, aes(year_range, mean, color = group)) +
+  geom_point()
+
+####################################
+# Importing data
+trend_sp <- read_csv("output/trend_sp.csv")
+
+# Overall trend
+ggplot(trend_sp,aes(fct_reorder(species, mean_trend), mean_trend, fill = trend_status, col = trend_status)) +
   geom_bar(stat="identity", position="identity") + xlab("Species") + ylab("Long-term trend") + theme_classic() +
   scale_fill_manual(values = c("darkgoldenrod1", "skyblue3")) +
   scale_color_manual(values = c("darkgoldenrod1", "skyblue3")) +
@@ -101,10 +170,8 @@ ggplot(model_sum_rec_up,aes(fct_reorder(species, mean_trend), mean_trend, fill =
 ggsave("output/trends.png")
 
 # Significance status
-data <- read_csv("output/model_summary_2yr_up.csv")
-
-ggplot(data,aes(fct_reorder(species, mean_trend), mean_trend, 
-                fill = trend_status, col = trend_status)) +
+ggplot(trend_sp,aes(fct_reorder(species, mean_trend), mean_trend, 
+                fill = significance_status, col = significance_status)) +
   geom_bar(stat="identity", position="identity") + xlab("Species") + ylab("Long-term trend") + theme_classic() +
   scale_fill_manual(values = c("deepskyblue", "darkgoldenrod1", "skyblue3")) +
   scale_color_manual(values = c("deepskyblue", "darkgoldenrod1", "skyblue3")) +

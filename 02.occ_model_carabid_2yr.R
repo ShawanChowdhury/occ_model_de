@@ -126,7 +126,7 @@ n.report <- 10000
 #############################################
 # Main model
 det.formula <- ~ (1|year_group) + nuSpecies # Use the factor value of year
-occ.formula <- ~ factor(year_group) - 1 + (1|site) # Use the factor value of year
+occ.formula <- ~ year_group + (1|site) # Use the factor value of year
 
 out <- tPGOcc(occ.formula = occ.formula,
               det.formula = det.formula,

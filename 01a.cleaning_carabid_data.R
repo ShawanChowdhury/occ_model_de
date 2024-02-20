@@ -27,8 +27,13 @@ gbif_data <- gbif_data[!duplicated(gbif_data),]
 # Renaming columns
 colnames(gbif_data) <- c("species", "lon", "lat", "year", "month", "day")
 
+# Exporting output
+write_csv(gbif_data, "data/gbif_data_cleaned.csv")
+
 ##################################################
 # Importing carabid data
+gbif_data <- read_csv("data/gbif_data_cleaned.csv")
+
 data <- read_csv("data/carabid_initial_data_up.csv")
 data <- data[,2:7]
 
@@ -51,3 +56,9 @@ com_data <- com_data %>%
 
 # Exporting data
 write_csv(com_data, "data/com_data.csv")
+
+###############################################
+# Median species occurrence records
+sp_rec <- com_data %>% 
+  group_by(species) %>% 
+  summarise(n = NROW(species))
