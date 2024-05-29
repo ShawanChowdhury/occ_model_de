@@ -4,25 +4,9 @@ library(tidyverse)
 ###########################################################
 # Importing and combining data
 ###########################################################
-# Earlier, using the intersect toolbar in ArcGIS, I grouped all the carabid distribution records
-# into MTB quadrants. We can also do it in R, but ArcGIS is faster.
-# Import data
-# complete_data <- read_delim("data/com_mtb.txt")
-# 
-# # Data organising
-# # Changing coloumn names
-# colnames(complete_data)
-# colnames(complete_data)[11] <- "site"
-# 
-# # Selecting required variables
-# complete_data <- complete_data %>%
-#   select(site, species, lon, lat, day, month, year, year_group)
-# 
-# # Exporting revised data [to manually check if everything looks okay]
-# write_csv(complete_data, "data/carabid_data_up.csv")
-
 # Importing revised data
-complete_data <- read_csv("data/carabid_data_up.csv")
+complete_data <- read_csv("data/com_data.csv")
+colnames(complete_data)[8] <- "site"
 
 complete_data$lon <- as.numeric(complete_data$lon)
 complete_data$lat <- as.numeric(complete_data$lat)

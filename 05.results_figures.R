@@ -146,6 +146,60 @@ ggplot(data, aes(lon, lat, col = year_group)) +
 
 ggsave("output/year-wise_rec_map_2yr.png")
 
+# Map for species with highest/lowest trends
+data <- read_csv("data/carabid_data_up.csv")
+
+data_sub <- data %>% 
+  filter(species %in% c("Bembidion velox"))
+data_sub$species <- as.factor(data_sub$species)
+
+data_sub$species <- ordered(data_sub$species, levels=c("Pterostichus negligens", "Pogonus iridipennis", "Elaphropus walkeriana",
+                                                       "Elaphropus diabrachys", "Ophonus ardosiacus", "Abax ovalis"))
+
+ggplot(data_sub, aes(lon, lat, col = year_group)) +
+  geom_point(size = 2) + theme_classic() +
+  xlab("Longitude") +ylab("Latitude") +
+  geom_polygon(data = germany, aes(x = long, y = lat, group = group),fill = NA, colour = "black") +
+  coord_quickmap() + xlim(5, 16) + ylim(46, 56) + 
+  theme(legend.title = element_blank())  +
+  scale_color_gradient(low = "green", high = "purple")
+
+ggsave("output/sample_species.png")
+
+####################################
+# Creating all species distribution map
+# Species distribution data
+data <- read_csv("data/carabid_data_up.csv")
+
+# German map
+world <- getMap(resolution = "low")
+germany <- world[world@data$NAME %in% "Germany", ] 
+
+# species list
+trend <- read_csv("output/prev/trend_trait_carabid_2yr.csv")
+sp <- unique(trend$species)
+
+for (i in sp) {
+  
+  print(i)
+  
+  data_sub <- data %>% 
+    filter(species %in% c(i))
+  
+  p <- ggplot(data_sub, aes(lon, lat, col = year_group)) +
+    geom_point(size = 0.5) + theme_classic() +
+    xlab("Longitude") +ylab("Latitude") +
+    geom_polygon(data = germany, aes(x = long, y = lat, group = group),fill = NA, colour = "black") +
+    coord_quickmap() + xlim(5, 16) + ylim(46, 56) + 
+    theme(legend.title = element_blank()) +
+    ggtitle(i)  +
+    scale_color_gradient(low = "blue", high = "green")
+  
+  
+  ggsave(p,filename=paste("output/map/",i,".png"))  
+  
+}
+
 ####################################
 # Trend by year-range
 

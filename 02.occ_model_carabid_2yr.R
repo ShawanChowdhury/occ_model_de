@@ -30,11 +30,11 @@ visit_data <- visit_data %>%
   ungroup()
 
 # Metadata for each visit
-# The species binary matric
+# The species binary matrix
 occMatrix <- read_rds("data/occ_matrix_carabid_2yr.rds")
 # Each row is a visit, while each column is data for a species
 
-# Check the visit data fram and occ matrix align
+# Check the visit data frame and occ matrix align
 all(visit_data$visit==row.names(occMatrix))
 # This should be TRUE - if not, you need to rearrange the above objects.
 # [sometimes, it might show 'False' even if they align perfectly, but the model
@@ -126,7 +126,7 @@ n.report <- 10000
 #############################################
 # Main model
 det.formula <- ~ (1|year_group) + nuSpecies # Use the factor value of year
-occ.formula <- ~ year_group + (1|site) # Use the factor value of year
+occ.formula <- ~ (year_group-1) + (1|site) # Use the factor value of year
 
 out <- tPGOcc(occ.formula = occ.formula,
               det.formula = det.formula,
