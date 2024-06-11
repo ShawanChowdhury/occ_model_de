@@ -18,9 +18,6 @@ complete_data$day <- as.numeric(complete_data$day)
 # Preparing data for model
 ###########################################################
 # Add site information
-#I have already assigned the MTB grid cells as site, so I don't need to create site information
-# Helge/Florian: For visit information, only use site and year, instead of day+month+year.
-
 # Add visit information [keep year here]
 complete_data$date <- paste(complete_data$day, complete_data$month, complete_data$year, sep="-")
 

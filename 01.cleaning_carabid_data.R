@@ -2,6 +2,7 @@
 library(dplyr)
 library(tidyverse)
 library(sf)
+
 ##############################
 # GBIF data
 # We initially decided to include the GBIF data, but then decided not to.
@@ -34,7 +35,11 @@ data_yr <- data %>%
 write_csv(data_yr, "data/com_data.csv")
 
 ###############################################
+com_data <- read_csv("data/com_data.csv")
+
 # Median species occurrence records
 sp_rec <- com_data %>% 
   group_by(species) %>% 
   summarise(n = NROW(species))
+
+median(sp_rec$n) # 346
