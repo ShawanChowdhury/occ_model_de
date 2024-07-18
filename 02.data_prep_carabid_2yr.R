@@ -5,7 +5,7 @@ library(tidyverse)
 # Importing and combining data
 ###########################################################
 # Importing revised data
-complete_data <- read_csv("data/com_data.csv")
+complete_data <- read_csv("data/com_data_tagged.csv")
 colnames(complete_data)[8] <- "site"
 
 complete_data$lon <- as.numeric(complete_data$lon)
@@ -57,8 +57,9 @@ complete_data <- complete_data %>% filter(site %in% surveyYears$site[surveyYears
 # Remove very rare species
 selectSpecies <- subset(speciesSummary, nuRecs > 49)
 
-# Filtering species with > 49 records
+# Filtering species with > 49 records [need this list for HPC]
 species_list <- selectSpecies[, 1]
+write.csv(species_list, "data/species.csv")
 
 # Exporting species list
 write_csv(species_list, "data/species_list.csv")
