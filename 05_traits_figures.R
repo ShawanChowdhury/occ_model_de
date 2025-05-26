@@ -18,6 +18,21 @@ trend_trait <- dplyr::left_join(trend, trait, by = c("species"))
 
 write_csv(trend_trait, "output/trend_trait_carabid_2yr.csv")
 
+# Number of species in each trait group
+data <- read_csv("output/trend_trait_carabid_2yr.csv")
+
+data <- data %>% 
+  dplyr::select(wings, trophicLevel, habitatPref)
+
+data_long <- data %>% 
+  pivot_longer(cols = c(wings, trophicLevel, habitatPref),
+               names_to = "trait",
+               values_to = "sub_trait")
+
+sum <- data_long %>% 
+  group_by(trait, sub_trait) %>% 
+  summarise(n = NROW(trait))
+
 ####################################
 # Reading data file
 data <- read_csv("output/trend_trait_carabid_2yr.csv")
@@ -77,11 +92,21 @@ merge <- merge[2:13,]
 # Exporting output
 write_csv(merge, "output/model_trait.csv")
 
+# Importing dataset
+merge <- read_csv("output/model_trait.csv")
+
+merge$term <- factor(merge$term, levels=c("Small", "Large", "Medium", "Herbivore",
+                              "Omnivore", "Predator", "Coastal", "Eurytopic", "Forest", "Riparian",
+                              "Special", "Wetland", "Open", "Long-winged", "Short-winged", "Dimorphic"))
+
+merge$trait_group <- factor(merge$trait_group, levels = c("Body size", "Trophic level",
+                                                          "Habitat preference", "Wing type"))
 # Plot
-ggplot(merge, aes(term, estimate)) +
+ggplot(merge, aes(term, estimate, fill = trait_group)) +
   geom_crossbar(aes(ymin = lower_5, ymax = upper_95), width = 0.2) +
   xlab("") + ylab("Effect size on trend") + theme_classic() + coord_flip() +
-  geom_hline(yintercept = 0, linetype="dashed", color = "black")
+  geom_hline(yintercept = 0, linetype="dashed", color = "black") +
+  theme(legend.position = "none")
 
 ggsave("output/effect_size_trend.png")
 
@@ -129,17 +154,22 @@ ggsave("output/effect_size_trend.png")
 # Reading data file
 data <- read_csv("output/trend_trait_carabid_2yr.csv")
 
+# data <- data %>% 
+#   filter(!species == c("Ocys tachysoides")) 
+# # It's because there was no trait information for that species
+
+# Removing Data Deficient species
 data <- data %>% 
-  filter(!species == c("Ocys tachysoides")) 
-# It's because there was no trait information for that species
+  filter(!thrt_status == c("Data-Deficient")) 
 
 ggplot(data, aes(thrt_status, mean_trend)) +
   geom_boxplot(outlier.shape = NA) +
-  geom_jitter(width = 0.05, alpha = 0.5, aes(col = trend_status)) +
+  geom_jitter(width = 0.2, alpha = 0.5, aes(col = trend_status)) +
   theme_classic() + xlab("") + ylab("Long-term trend") +
   scale_color_manual(values = c("grey", "darkgoldenrod1", "deepskyblue1")) +
   theme(legend.position = "top",
-        legend.title = element_blank())
+        legend.title = element_blank()) +
+  geom_hline(yintercept = 0, lty = 'dashed')
 
 ggsave("output/trend_thrt_status.png")
 

@@ -2,6 +2,8 @@
 library(tidyverse)
 library(ggplot2)
 library(rworldmap)
+library(sf)
+library(tmap)
 
 ####################################
 # Merge csvs
@@ -88,6 +90,20 @@ ggplot(data, aes(lon, lat, col = year_group)) +
 
 ggsave("output/year-wise_rec_map_2yr.png")
 
+######################################################
+# Distribution by MTB grids
+data_sum <- data %>% 
+  group_by(site, year_group) %>% 
+  summarise(n = NROW(site)) %>% 
+  mutate(n_yr = NROW(n)) %>% 
+  select(site, n_yr) %>% 
+  distinct() %>% 
+  group_by(n_yr) %>% 
+  summarise(n = NROW(site))
+
+# Exporting output
+write_csv(data_sum, "output/n_yr_grid.csv")
+
 ####################################
 # Figure 2
 # Importing data
@@ -102,3 +118,28 @@ ggplot(trend_sp,aes(fct_reorder(species, mean_trend), mean_trend, fill = trend_s
         legend.position = "top", axis.text.x = element_blank())
 
 ggsave("output/trends.png")
+
+#####################################
+# Importing shp
+data <- st_read("data/layer/carabid_int/carabid_int.shp")
+
+data_sum <- data %>% 
+  group_by(NAME) %>% 
+  summarise(n = NROW(year))
+
+data_sum <- data_sum %>%
+  mutate(quantile=cut(n, breaks=c(0, 11, 35, 70, 100, 500, 24117),
+                      labels=c(1, 2, 3, 4, 5, 6)))
+
+# Convert to sf object
+sf_data <- st_as_sf(data_sum, wkt = "geometry")
+
+ggplot(data = sf_data) +
+  geom_sf(aes(col = quantile, fill = quantile)) +
+  scale_color_viridis_d() +
+  scale_fill_viridis_d() +  # Use a continuous color scale
+  theme_classic() +
+  xlab("Longitude") + ylab("Latitude") + theme(legend.title = element_blank())
+
+ggsave("output/dist_data_grid.png")
+

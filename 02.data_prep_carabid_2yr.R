@@ -5,7 +5,7 @@ library(tidyverse)
 # Importing and combining data
 ###########################################################
 # Importing revised data
-complete_data <- read_csv("data/com_data_tagged.csv")
+complete_data <- read_csv("data/com_data.csv")
 colnames(complete_data)[8] <- "site"
 
 complete_data$lon <- as.numeric(complete_data$lon)
@@ -42,9 +42,17 @@ surveySummary <- surveys %>%
   count() %>%
   filter(n>1) 
 
+# For sensitivity analysis, we are rerunning the model for species, which were
+# observed at least five times.
+surveySummary <- surveys %>%
+  filter(site %in% surveyYears$site[surveyYears$nuYears>1]) %>%
+  group_by(site, year_group) %>%
+  count() %>%
+  filter(n>4) 
+
 # Records per species
 speciesSummary <- complete_data %>%
-  filter(site %in% surveyYears$site[surveyYears$nuYears>1]) %>%
+  filter(site %in% surveyYears$site[surveyYears$nuYears>4]) %>%
   group_by(species) %>%
   summarise(nuRecs = length(species),
             nuSites = length(unique(site)),
@@ -52,7 +60,7 @@ speciesSummary <- complete_data %>%
 summary(speciesSummary)
 
 # Use sites visited in at least two years
-complete_data <- complete_data %>% filter(site %in% surveyYears$site[surveyYears$nuYears>1]) 
+complete_data <- complete_data %>% filter(site %in% surveyYears$site[surveyYears$nuYears>4]) 
 
 # Remove very rare species
 selectSpecies <- subset(speciesSummary, nuRecs > 49)
