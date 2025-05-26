@@ -5,7 +5,7 @@ library(MCMCvis)
 library(docopt)
 
 ### Setting parameters for the HPC #############################################
-doc <- "usage: 02.occ_model_carabid_2yr.R <species> <output_dir>"
+doc <- "usage: 03.occ_model_carabid_2yr.R <species> <output_dir>"
 opts <- docopt(doc)
 
 ## read parameter file
