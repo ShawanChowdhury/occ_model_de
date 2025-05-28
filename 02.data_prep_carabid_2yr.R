@@ -44,15 +44,15 @@ surveySummary <- surveys %>%
 
 # For sensitivity analysis, we are rerunning the model for species, which were
 # observed at least five times.
-surveySummary <- surveys %>%
-  filter(site %in% surveyYears$site[surveyYears$nuYears>1]) %>%
-  group_by(site, year_group) %>%
-  count() %>%
-  filter(n>4) 
+# surveySummary <- surveys %>%
+#   filter(site %in% surveyYears$site[surveyYears$nuYears>1]) %>%
+#   group_by(site, year_group) %>%
+#   count() %>%
+#   filter(n>4) 
 
 # Records per species
 speciesSummary <- complete_data %>%
-  filter(site %in% surveyYears$site[surveyYears$nuYears>4]) %>%
+  filter(site %in% surveyYears$site[surveyYears$nuYears>1]) %>%
   group_by(species) %>%
   summarise(nuRecs = length(species),
             nuSites = length(unique(site)),
@@ -60,7 +60,7 @@ speciesSummary <- complete_data %>%
 summary(speciesSummary)
 
 # Use sites visited in at least two years
-complete_data <- complete_data %>% filter(site %in% surveyYears$site[surveyYears$nuYears>4]) 
+complete_data <- complete_data %>% filter(site %in% surveyYears$site[surveyYears$nuYears>1]) 
 
 # Remove very rare species
 selectSpecies <- subset(speciesSummary, nuRecs > 49)

@@ -58,7 +58,7 @@ visitSummary <- visit_data %>%
 # Subsample at most 10 visits per year at any specific site
 visit_data <- visit_data %>%
   group_by(site, year_group) %>%
-  mutate(mySample = ifelse(length(visit)>10, 10, length(visit))) %>% 
+  mutate(mySample = ifelse(length(visit)>15, 15, length(visit))) %>% 
   sample_n(.,size=unique(mySample)) %>%
   ungroup()
 
@@ -181,3 +181,4 @@ psiCovs <- psiCovs %>%
 # Exporting output
 output_file <- write.csv(psiCovs, file = paste0("/work/chowdhus/ModelOutput/2yr/ModelSummary_", 
                                                 species_name,".csv"))
+
